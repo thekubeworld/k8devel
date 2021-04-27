@@ -1,4 +1,4 @@
-module github.com/dougsland/k8devel
+module github.com/thekubeworld/k8devel
 
 go 1.16
 
