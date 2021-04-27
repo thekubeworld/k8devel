@@ -94,7 +94,6 @@ func CreateDeployment(c *Client, d *Deployment) error {
         }
 
 	// Create Deployment
-	logrus.Infof("\n")
 	logrus.Infof("Creating deployment: %s", d.Name)
 	result, err := deployClient.Create(
 		context.TODO(),
