@@ -197,7 +197,6 @@ func CreatePod(c *Client, p *Pod) error {
                 return err
         }
 
-	logrus.Infof("\n")
 	logrus.Infof("Creating pod: %s namespace: %s", p.Name, p.Namespace)
 
 	// Double check if pod is created
