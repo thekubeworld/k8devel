@@ -1,7 +1,0 @@
-Write example for each API method
-
-TODO:
-        service.Delete(&c, "kproxy-service", "ns-kproxy")
-        deployment.Delete(&c, "nginx-deployment", "ns-kproxy")
-        endpoint.Delete(&c, "kproxy-service", "ns-kproxy")
-
