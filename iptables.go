@@ -42,6 +42,7 @@ func IPTablesLoadPreDefinedCommands() IPTables {
 
 	IPTablesCmd.ReadNatTable = []string {
 		"iptables",
+		"-w",
 		"-t",
 		"nat",
 		"-L",
@@ -51,6 +52,7 @@ func IPTablesLoadPreDefinedCommands() IPTables {
 
 	IPTablesCmd.ReadFilterTable = []string {
 		"iptables",
+		"-w",
 		"-t",
 		"filter",
 		"-L",
@@ -60,6 +62,7 @@ func IPTablesLoadPreDefinedCommands() IPTables {
 
 	IPTablesCmd.ReadNatTableKubeServices = []string {
 		"iptables",
+		"-w",
 		"-L",
 		"-n",
 		"-v",
