@@ -59,7 +59,7 @@ func CreateNamespace(c *Client, namespace string) error {
 
         ns := &v1.Namespace {
                 ObjectMeta: metav1.ObjectMeta {
-                Name: c.Namespace,
+                Name: namespace,
                         Labels: map[string]string {
                                 "name": namespace,
                         },

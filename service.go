@@ -47,7 +47,7 @@ type Service struct {
 //	}
 //}
 
-// Delete deletes a service
+// DeleteService deletes a service
 //
 // Args:
 //	Client - client struct from the client module
@@ -113,7 +113,7 @@ func GetIPFromService(c *Client,
 
 }
 
-// Exists will check if the service exists or not
+// ExistsService will check if the service exists or not
 //
 // Args:
 //     - Pointer to a Client struct
