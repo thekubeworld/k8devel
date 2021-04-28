@@ -39,6 +39,8 @@ type Pod struct {
 	Image string
 	Command []string
 	CommandArgs []string
+	LabelKey string
+	LabelValue string
 }
 
 // ExecCmdPod executes a command inside a POD
@@ -184,6 +186,9 @@ func CreatePod(c *Client, p *Pod) error {
 					Image: p.Image,
 					Command: p.Command,
 					Args: p.CommandArgs,
+					Labels: map[string]string {
+						s.LabelKey: s.LabelValue,
+					},
 				},
 			},
 		},
