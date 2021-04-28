@@ -178,6 +178,9 @@ func CreatePod(c *Client, p *Pod) error {
 		ObjectMeta: metav1.ObjectMeta {
 			Name: p.Name,
 			Namespace: p.Namespace,
+			Labels: map[string]string {
+				p.LabelKey: p.LabelValue,
+			},
 		},
 		Spec: v1.PodSpec {
 			Containers: []v1.Container{
@@ -186,9 +189,6 @@ func CreatePod(c *Client, p *Pod) error {
 					Image: p.Image,
 					Command: p.Command,
 					Args: p.CommandArgs,
-					Labels: map[string]string {
-						s.LabelKey: s.LabelValue,
-					},
 				},
 			},
 		},
