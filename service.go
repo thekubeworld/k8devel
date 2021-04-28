@@ -131,7 +131,7 @@ func ExistsService(c *Client, service string, namespace string) (string, error) 
         return exists.Name, nil
 }
 
-// CreateService creates a service using the values
+// CreateClusterIPService creates a service using the values
 // from the Service struct via the Client.Clientset 
 //
 // Args:
@@ -140,7 +140,7 @@ func ExistsService(c *Client, service string, namespace string) (string, error) 
 //
 //   Returns:
 //      error or nil
-func CreateService(c *Client, s *Service) error {
+func CreateClusterIPService(c *Client, s *Service) error {
         service := &v1.Service {
                 ObjectMeta: metav1.ObjectMeta {
                         Name: s.Name,
