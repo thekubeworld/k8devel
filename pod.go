@@ -210,10 +210,10 @@ func CreatePod(c *Client, p *Pod) error {
 		if exists != "" {
 			break
 		}
-                time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
 		if i == c.NumberMaxOfAttemptsPerTask {
 			return errors.New("cannot create pod")
 		}
+		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
         }
 	return nil
 }
