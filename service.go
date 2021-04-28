@@ -21,6 +21,7 @@ import (
 	"time"
 	v1 "k8s.io/api/core/v1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,8 +32,12 @@ type Service struct {
         LabelKey string
         LabelValue string
         Port int32
+        PortName string
+        PortProtocol string
         SelectorKey string
         SelectorValue string
+        DualStackEnabled bool
+        TargetPort int
         ClusterIP string
 	// Possible values for clusterIP:
 	//   - None: headless service when proxying is not required
@@ -176,6 +181,66 @@ func CreateClusterIPService(c *Client, s *Service) error {
         }
 
 	logrus.Infof("Created service: %s namespace: %s",
+		s.Name,
+		s.Namespace)
+
+        return nil
+}
+
+// CreateNodePortService creates a service using the values
+// from the Service struct via the Client.Clientset
+//
+// Args:
+//    Service - Service struct
+//    Client  - Client strucut
+//
+//   Returns:
+//      error or nil
+func CreateNodePortService(c *Client, s *Service) error {
+	podProtocol, err := DetectContainerPortProtocol(s.PortProtocol)
+        service := &v1.Service {
+                ObjectMeta: metav1.ObjectMeta {
+                        Name: s.Name,
+                        Namespace: s.Namespace,
+                        Labels: map[string]string {
+                                s.LabelKey: s.LabelValue,
+                        },
+                },
+                Spec: v1.ServiceSpec {
+                        Type: v1.ServiceTypeNodePort,
+                        Ports: []v1.ServicePort {
+                                {
+					Port: s.Port,
+					Name: s.PortName,
+					Protocol: podProtocol,
+					TargetPort: intstr.FromInt(s.TargetPort),
+				},
+                },
+			Selector: map[string]string {
+				s.SelectorKey: s.SelectorValue,
+			},
+		},
+        }
+
+        if s.DualStackEnabled {
+                requireDual := v1.IPFamilyPolicyRequireDualStack
+                service.Spec.IPFamilyPolicy = &requireDual
+        }
+
+	logrus.Infof("\n")
+	logrus.Infof("Creating Nodeport service: %s namespace: %s",
+		s.Name,
+		c.Namespace)
+
+        _, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
+                context.TODO(),
+		service,
+                metav1.CreateOptions{})
+        if err != nil {
+                return err
+        }
+
+	logrus.Infof("Created Nodeport service: %s namespace: %s",
 		s.Name,
 		s.Namespace)
 
