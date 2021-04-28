@@ -39,6 +39,7 @@ type Service struct {
         DualStackEnabled bool
         TargetPort int
         ClusterIP string
+        NodePort int32
 	// Possible values for clusterIP:
 	//   - None: headless service when proxying is not required
 	//   - empty string or "": Auto Generated
@@ -214,6 +215,7 @@ func CreateNodePortService(c *Client, s *Service) error {
 					Name: s.PortName,
 					Protocol: podProtocol,
 					TargetPort: intstr.FromInt(s.TargetPort),
+					NodePort: s.NodePort,
 				},
                 },
 			Selector: map[string]string {
