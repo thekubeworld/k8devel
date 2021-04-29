@@ -19,12 +19,13 @@ limitations under the License.
 import (
 	"bytes"
 	"context"
-	"strings"
 	"errors"
+	"strings"
 	"time"
 
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/remotecommand"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	v1 "k8s.io/api/core/v1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -147,6 +148,71 @@ func FindPodsWithNameContains(c *Client,
         return podsFound, len(podsFound)
 }
 
+// isPodRunning will check if the pod is running
+//
+// Args:
+//	- Pointer to a client struct
+//	- podname
+//	- namespace
+//
+// Returns:
+//	bool or error
+func isPodRunning(c *Client, podname, namespace string) wait.ConditionFunc {
+	return func() (bool, error) {
+		logrus.Infof(".") // progress bar
+		pod, err := c.Clientset.CoreV1().Pods(namespace).Get(
+			context.TODO(),
+			podname,
+			metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+
+		switch pod.Status.Phase {
+		case v1.PodRunning:
+			return true, nil
+		case v1.PodFailed, v1.PodSucceeded:
+			return false, errors.New("pod not running")
+		}
+		return false, nil
+	}
+}
+
+// waitForPodRunning will execute wait.PollImmediate
+//
+// Args:
+//	- Pointer to a client struct
+//	- podname
+//	- namespace
+//
+// Returns:
+//	nil or error
+func waitForPodRunning(c *Client, namespace, podname string, timeout time.Duration) error {
+	return wait.PollImmediate(
+		time.Second,
+		timeout,
+		isPodRunning(c, podname, namespace))
+}
+
+// WaitForPodInRunningState will execute waitForPodRunning
+//
+// Args:
+//	- Pointer to a client struct
+//	- podname
+//	- namespace
+//
+// Returns:
+//	nil or error
+func WaitForPodInRunningState(c *Client, podname string, namespace string) error {
+	if err := waitForPodRunning(c,
+			namespace,
+			podname,
+			time.Duration(c.TimeoutTaksInSec)*time.Second); err != nil {
+		return err
+	}
+	return nil
+}
+
 // ExistsPod will check if the pod exists or not
 //
 // Args:
@@ -203,17 +269,9 @@ func CreatePod(c *Client, p *Pod) error {
         }
 
 	logrus.Infof("Creating pod: %s namespace: %s", p.Name, p.Namespace)
-
-	// Double check if pod is created
-        for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
-                exists, _ := ExistsPod(c, p.Name, p.Namespace)
-		if exists != "" {
-			break
-		}
-		if i == c.NumberMaxOfAttemptsPerTask {
-			return errors.New("cannot create pod")
-		}
-		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
-        }
+	err = WaitForPodInRunningState(c, p.Name, p.Namespace)
+	if err != nil {
+		return err
+	}
 	return nil
 }

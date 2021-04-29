@@ -35,7 +35,7 @@ type Client struct {
 	Restconfig *rest.Config
 	Kubeconfig clientcmd.ClientConfig
 	TimeoutTaksInSec int
-        NumberMaxOfAttemptsPerTask int
+	NumberMaxOfAttemptsPerTask int
 }
 
 // Connect will connect to specific Cluster
