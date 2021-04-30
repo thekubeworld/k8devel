@@ -24,7 +24,7 @@ import (
 
 	v1beta1 "k8s.io/api/policy/v1beta1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/sirupsen/logrus"
+	//"github.com/sirupsen/logrus"
 )
 
 // ListAllPodSecurityPolicy will list all PodSecurityPolicoies
@@ -46,48 +46,48 @@ func ListAllPodSecurityPolicy(c *Client) error {
 		return errors.New("no PodSecurityPolicies found; assuming PodSecurityPolicy is disabled")
 	}
 	for i := 0; i < len(psp.Items); i++ {
-		logrus.Infof("\n")
-		logrus.Infof("Name: %s", psp.Items[i].Name)
-		logrus.Infof("\tPrivileged: %v", psp.Items[i].Spec.Privileged)
+		fmt.Println("\n")
+		fmt.Println("Name:", psp.Items[i].Name)
+		fmt.Println("\tPrivileged:", psp.Items[i].Spec.Privileged)
 
 		if psp.Items[i].Spec.AllowPrivilegeEscalation != nil {
-			logrus.Infof("\tAllow PrivilegeEscalation: %v", *psp.Items[i].Spec.AllowPrivilegeEscalation)
+			fmt.Println("\tAllow PrivilegeEscalation:", *psp.Items[i].Spec.AllowPrivilegeEscalation)
 		} else {
-			logrus.Infof("\tAllow PrivilegeEscalation: unset")
+			fmt.Println("\tAllow PrivilegeEscalation: unset")
 		}
 
-		logrus.Infof("\tRequired DropCapabilities: %v", psp.Items[i].Spec.RequiredDropCapabilities)
-		logrus.Infof("\tDefault AddCapabilities: %v", psp.Items[i].Spec.DefaultAddCapabilities)
-		logrus.Infof("\tRequired DropCapabilities: %v", psp.Items[i].Spec.RequiredDropCapabilities)
-		logrus.Infof("\tAllowed Capabilities: %v", psp.Items[i].Spec.AllowedCapabilities)
-		logrus.Infof("\tVolumes: %v", psp.Items[i].Spec.Volumes)
+		fmt.Println("\tRequired DropCapabilities:", psp.Items[i].Spec.RequiredDropCapabilities)
+		fmt.Println("\tDefault AddCapabilities:", psp.Items[i].Spec.DefaultAddCapabilities)
+		fmt.Println("\tRequired DropCapabilities:", psp.Items[i].Spec.RequiredDropCapabilities)
+		fmt.Println("\tAllowed Capabilities:", psp.Items[i].Spec.AllowedCapabilities)
+		fmt.Println("\tVolumes:", psp.Items[i].Spec.Volumes)
 
 		if len(psp.Items[i].Spec.AllowedFlexVolumes) > 0 {
-			logrus.Infof("\tAllowed FlexVolumes: %v", psp.Items[i].Spec.AllowedFlexVolumes)
+			fmt.Println("\tAllowed FlexVolumes:", psp.Items[i].Spec.AllowedFlexVolumes)
 		}
-		logrus.Infof("\tAllowed CSIDrivers: %v", psp.Items[i].Spec.AllowedCSIDrivers)
-		logrus.Infof("\tAllowed UnsafeSysctls: %v", psp.Items[i].Spec.AllowedUnsafeSysctls)
-		logrus.Infof("\tForbidden Sysctls: %v", psp.Items[i].Spec.ForbiddenSysctls)
-		logrus.Infof("\tAllow Host Network: %v", psp.Items[i].Spec.HostNetwork)
-		logrus.Infof("\tAllow Host Ports: %v", psp.Items[i].Spec.HostPorts)
-		logrus.Infof("\tAllow Host PID: %v", psp.Items[i].Spec.HostPID)
-		logrus.Infof("\tAllow Host IPC: %v", psp.Items[i].Spec.HostIPC)
-		logrus.Infof("\tRead Only Root Filesystem: %v", psp.Items[i].Spec.ReadOnlyRootFilesystem)
-		logrus.Infof("\tSELinux Context Strategy: %v", psp.Items[i].Spec.SELinux.Rule)
+		fmt.Println("\tAllowed CSIDrivers:", psp.Items[i].Spec.AllowedCSIDrivers)
+		fmt.Println("\tAllowed UnsafeSysctls:", psp.Items[i].Spec.AllowedUnsafeSysctls)
+		fmt.Println("\tForbidden Sysctls:", psp.Items[i].Spec.ForbiddenSysctls)
+		fmt.Println("\tAllow Host Network:", psp.Items[i].Spec.HostNetwork)
+		fmt.Println("\tAllow Host Ports:", psp.Items[i].Spec.HostPorts)
+		fmt.Println("\tAllow Host PID:", psp.Items[i].Spec.HostPID)
+		fmt.Println("\tAllow Host IPC:", psp.Items[i].Spec.HostIPC)
+		fmt.Println("\tRead Only Root Filesystem:", psp.Items[i].Spec.ReadOnlyRootFilesystem)
+		fmt.Println("\tSELinux Context Strategy:", psp.Items[i].Spec.SELinux.Rule)
                 if psp.Items[i].Spec.SELinux.SELinuxOptions != nil {
-			logrus.Infof("\t\tUser: %s", psp.Items[i].Spec.SELinux.SELinuxOptions.User)
-			logrus.Infof("\t\tRole: %s", psp.Items[i].Spec.SELinux.SELinuxOptions.Role)
-			logrus.Infof("\t\tSELinux Type: %s", psp.Items[i].Spec.SELinux.SELinuxOptions.Type)
-			logrus.Infof("\t\tLevel: %s", psp.Items[i].Spec.SELinux.SELinuxOptions.Level)
+			fmt.Println("\t\tUser:", psp.Items[i].Spec.SELinux.SELinuxOptions.User)
+			fmt.Println("\t\tRole:", psp.Items[i].Spec.SELinux.SELinuxOptions.Role)
+			fmt.Println("\t\tSELinux Type:", psp.Items[i].Spec.SELinux.SELinuxOptions.Type)
+			fmt.Println("\t\tLevel:", psp.Items[i].Spec.SELinux.SELinuxOptions.Level)
                 }
-		logrus.Infof("\tRun As User Strategy: %s", psp.Items[i].Spec.RunAsUser.Rule)
-		logrus.Infof("\tRanges: %s", psp.Items[i].Spec.RunAsUser.Ranges)
+		fmt.Println("\tRun As User Strategy:", psp.Items[i].Spec.RunAsUser.Rule)
+		fmt.Println("\tRanges: ", psp.Items[i].Spec.RunAsUser.Ranges)
 
-		logrus.Infof("\tFSGroup Strategy: %s", psp.Items[i].Spec.FSGroup.Rule)
-		logrus.Infof("\tRanges: %s", psp.Items[i].Spec.FSGroup.Ranges)
+		fmt.Println("\tFSGroup Strategy:", psp.Items[i].Spec.FSGroup.Rule)
+		fmt.Println("\tRanges:", psp.Items[i].Spec.FSGroup.Ranges)
 
-		logrus.Infof("\tSupplemental Groups Strategy: %s:", psp.Items[i].Spec.SupplementalGroups.Rule)
-		logrus.Infof("\tRanges: %s", idRangeToString(psp.Items[i].Spec.SupplementalGroups.Ranges))
+		fmt.Println("\tSupplemental Groups Strategy:", psp.Items[i].Spec.SupplementalGroups.Rule)
+		fmt.Println("\tRanges:", idRangeToString(psp.Items[i].Spec.SupplementalGroups.Ranges))
         }
 	return nil
 }
