@@ -38,8 +38,10 @@ type Service struct {
         SelectorValue string
         DualStackEnabled bool
         TargetPort int
-        ClusterIP string
         NodePort int32
+        LoadBalancerIP string
+
+        ClusterIP string
 	// Possible values for clusterIP:
 	//   - None: headless service when proxying is not required
 	//   - empty string or "": Auto Generated
@@ -93,6 +95,31 @@ func DeleteService(c *Client, service string, namespace string) error {
 
 	return nil
 }
+
+// GetExternalIPFromService will return the pod IP address
+//
+// Args:
+//
+//      - Client struct from client module
+//      - pod name
+//      - namespace
+//
+// Returns:
+//      - the IP as string or error
+//func GetExternalIPFromService(c *Client,
+//                svcName string,
+//                nameSpace string) (string, error) {
+//
+//        svc, err := c.Clientset.CoreV1().Services(nameSpace).Get(
+//                context.TODO(),
+//                svcName,
+//                metav1.GetOptions{})
+//        if err != nil {
+//                return "", err
+//        }
+//        return svc.Spec., nil
+//
+//}
 
 // GetIPFromService will return the pod IP address
 //
@@ -198,7 +225,7 @@ func CreateClusterIPService(c *Client, s *Service) error {
 //   Returns:
 //      error or nil
 func CreateNodePortService(c *Client, s *Service) error {
-	podProtocol, err := DetectContainerPortProtocol(s.PortProtocol)
+	serviceProtocol, err := DetectContainerPortProtocol(s.PortProtocol)
         service := &v1.Service {
                 ObjectMeta: metav1.ObjectMeta {
                         Name: s.Name,
@@ -213,7 +240,7 @@ func CreateNodePortService(c *Client, s *Service) error {
                                 {
 					Port: s.Port,
 					Name: s.PortName,
-					Protocol: podProtocol,
+					Protocol: serviceProtocol,
 					TargetPort: intstr.FromInt(s.TargetPort),
 					NodePort: s.NodePort,
 				},
@@ -243,6 +270,65 @@ func CreateNodePortService(c *Client, s *Service) error {
         }
 
 	logrus.Infof("Created Nodeport service: %s namespace: %s",
+		s.Name,
+		s.Namespace)
+
+        return nil
+}
+
+// CreateLoadBalancerService creates a service using the values
+// from the Service struct via the Client.Clientset
+//
+// Args:
+//    Service - Service struct
+//    Client  - Client strucut
+//
+//   Returns:
+//      error or nil
+func CreateLoadBalancerService(c *Client, s *Service) error {
+	serviceProtocol, err := DetectContainerPortProtocol(s.PortProtocol)
+        service := &v1.Service {
+                ObjectMeta: metav1.ObjectMeta {
+                        Name: s.Name,
+                        Namespace: s.Namespace,
+                        Labels: map[string]string {
+                                s.LabelKey: s.LabelValue,
+                        },
+                },
+                Spec: v1.ServiceSpec {
+                        Type: v1.ServiceTypeLoadBalancer,
+                        Ports: []v1.ServicePort {
+                                {
+					Port: s.Port,
+					Name: s.PortName,
+					Protocol: serviceProtocol,
+				},
+			},
+			Selector: map[string]string {
+				s.SelectorKey: s.SelectorValue,
+			},
+			LoadBalancerIP: s.LoadBalancerIP,
+		},
+        }
+        if s.DualStackEnabled {
+                requireDual := v1.IPFamilyPolicyRequireDualStack
+                service.Spec.IPFamilyPolicy = &requireDual
+        }
+
+	logrus.Infof("\n")
+	logrus.Infof("Creating LoadBalancer service: %s namespace: %s",
+		s.Name,
+		c.Namespace)
+
+        _, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
+                context.TODO(),
+		service,
+                metav1.CreateOptions{})
+        if err != nil {
+                return err
+        }
+
+	logrus.Infof("Created LoadBalancer service: %s namespace: %s",
 		s.Name,
 		s.Namespace)
 
