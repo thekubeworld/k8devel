@@ -26,6 +26,7 @@ type IPTables struct {
 	ReadNatTable []string
 	ReadFilterTable []string
 	ReadNatTableKubeServices []string
+	Save []string
 }
 
 // LoadPreDefinedIPTables loads several pre-defined
@@ -70,10 +71,15 @@ func IPTablesLoadPreDefinedCommands() IPTables {
 		"-t",
 		"nat",
 	}
+
+	IPTablesCmd.Save = []string {
+		"iptables-save",
+	}
+
 	return IPTablesCmd
 }
 
-// SaveNatTable save the current state of NAT table
+// IPTablesSave will save the current state of NAT table
 // from the container provider in the parameter
 //
 // Args:
@@ -84,11 +90,7 @@ func IPTablesLoadPreDefinedCommands() IPTables {
 //	file object
 //	filesystem which triggered this method
 //
-func IPTablesSaveNatTable(c *Client,
-		i *IPTables,
-		container string,
-		namespace string) (*os.File, error) {
-
+func IPTablesSave(c *Client, i *IPTables, container string, namespace string)(*os.File, error) {
 	fileRef, err := CreateTempFile(os.TempDir(), "iptables")
         if err != nil {
 		return nil, err
@@ -97,7 +99,7 @@ func IPTablesSaveNatTable(c *Client,
 	stdout, _, err := ExecCmdPod(c,
               container,
               namespace,
-              i.ReadNatTable)
+              i.Save)
         if err != nil {
 		return nil, err
         }
