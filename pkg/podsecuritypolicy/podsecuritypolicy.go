@@ -47,7 +47,7 @@ func ListAllPodSecurityPolicy(c *client.Client) error {
 		return errors.New("no PodSecurityPolicies found; assuming PodSecurityPolicy is disabled")
 	}
 	for i := 0; i < len(psp.Items); i++ {
-		fmt.Println("\n")
+		fmt.Println("")
 		fmt.Println("Name:", psp.Items[i].Name)
 		fmt.Println("\tPrivileged:", psp.Items[i].Spec.Privileged)
 
