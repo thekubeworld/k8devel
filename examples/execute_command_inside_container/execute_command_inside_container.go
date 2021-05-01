@@ -19,6 +19,7 @@ package main
 import (
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/logschema"
+	"github.com/thekubeworld/k8devel/pkg/pod"
         "github.com/sirupsen/logrus"
 )
 
