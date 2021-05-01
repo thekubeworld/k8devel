@@ -19,6 +19,7 @@ package main
 import (
 	"github.com/thekubeworld/k8devel/pkg/client"
         "github.com/thekubeworld/k8devel/pkg/logschema"
+        "github.com/thekubeworld/k8devel/pkg/service"
         "github.com/sirupsen/logrus"
 )
 
@@ -36,6 +37,7 @@ func main() {
         //      - $HOME/kubeconfig (Linux)
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
+	c.Namespace = namespace
 
 	s := service.Instance {
 		Name: newService,
@@ -47,7 +49,7 @@ func main() {
 		ClusterIP: "",
 		Port: 80,
 	}
-	err := service.Create(&c, &s)
+	err := service.CreateClusterIP(&c, &s)
 	if err != nil {
 		logrus.Fatal("exiting... failed to create: ", err)
 	}
