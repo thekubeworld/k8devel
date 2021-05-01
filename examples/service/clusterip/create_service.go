@@ -17,17 +17,18 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel"
+	"github.com/thekubeworld/k8devel/pkg/client"
+        "github.com/thekubeworld/k8devel/pkg/logschema"
         "github.com/sirupsen/logrus"
 )
 
 func main() {
-        k8devel.SetLogrusLogging()
+        logschema.SetLogrusLogging()
 
 	newService := "newservice" // Put here the new Service name
 	namespace := "default" // Put here the namespace name
 
-	c := k8devel.Client{}
+	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
 
@@ -36,7 +37,7 @@ func main() {
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
 
-	s := k8devel.Service {
+	s := service.Instance {
 		Name: newService,
 		Namespace: namespace,
 		LabelKey: "app",
@@ -46,12 +47,12 @@ func main() {
 		ClusterIP: "",
 		Port: 80,
 	}
-	err := k8devel.CreateService(&c, &s)
+	err := service.Create(&c, &s)
 	if err != nil {
 		logrus.Fatal("exiting... failed to create: ", err)
 	}
 
-	IPService, err := k8devel.GetIPFromService(
+	IPService, err := service.GetIP(
 		&c,
 		newService,
 		namespace)

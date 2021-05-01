@@ -17,13 +17,15 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel"
+	"github.com/thekubeworld/k8devel/pkg/client"
+        "github.com/thekubeworld/k8devel/pkg/logschema"
+        "github.com/thekubeworld/k8devel/pkg/podsecuritypolicy"
 )
 
 func main() {
-        k8devel.SetLogrusLogging()
+        logschema.SetLogrusLogging()
 
-	c := k8devel.Client{}
+	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
 
@@ -31,5 +33,5 @@ func main() {
         //      - $HOME/kubeconfig (Linux)
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
-	k8devel.ListAllPodSecurityPolicy(&c)
+	podsecuritypolicy.ListAllPodSecurityPolicy(&c)
 }

@@ -17,17 +17,18 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel"
+	"github.com/thekubeworld/k8devel/pkg/client"
+        "github.com/thekubeworld/k8devel/pkg/logschema"
         "github.com/sirupsen/logrus"
 )
 
 func main() {
-        k8devel.SetLogrusLogging()
+        logschema.SetLogrusLogging()
 
         containerName := "mytesting" // Put here the Pod name
 	namespace := "default" // Put here the namespace name
 
-	c := k8devel.Client{}
+	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
 
@@ -36,17 +37,7 @@ func main() {
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
 
-
-	PodCommandInitBash := []string {
-		"/bin/bash",
-	}
-
-	SleepOneDay := []string {
-		"-c",
-		"sleep 1d",
-        }
-
-        p := k8devel.Pod {
+        p := pod.Instance {
                 Name: containerName,
                 Namespace: namespace,
                 Image: "nginx",
@@ -54,6 +45,6 @@ func main() {
                 CommandArgs: SleepOneDay,
         }
 
-        k8devel.CreatePod(&c, &p)
+        pod.Create(&c, &p)
 	logrus.Infof("Pod %s namespace %s created!", p.Name, p.Namespace)
 }

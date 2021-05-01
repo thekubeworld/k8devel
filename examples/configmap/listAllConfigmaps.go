@@ -17,14 +17,16 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel"
+	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/configmap"
+	"github.com/thekubeworld/k8devel/pkg/logschema"
         "github.com/sirupsen/logrus"
 )
 
 func main() {
-        k8devel.SetLogrusLogging()
+        logschema.SetLogrusLogging()
 
-	c := k8devel.Client{}
+	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
 
@@ -33,7 +35,7 @@ func main() {
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
 
-	configMapList, err := k8devel.ListConfigMaps(&c)
+	configMapList, err := configmap.ListAll(&c)
 	if err != nil {
 		logrus.Fatal(err)
         }

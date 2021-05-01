@@ -17,7 +17,8 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel"
+	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/deployment"
         "github.com/sirupsen/logrus"
 )
 
@@ -27,7 +28,7 @@ func main() {
 	newDeployment := "newdeployment" // Put here the new deployment name
 	namespace := "default" // Put here the namespace name
 
-	c := k8devel.Client{}
+	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
 
@@ -36,7 +37,7 @@ func main() {
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
 
-	d := k8devel.Deployment {
+	d := deployment.Instance {
                 Name: newDeployment,
                 Namespace: namespace,
                 Replicas: 1,
@@ -50,7 +51,7 @@ func main() {
         d.Pod.ContainerPortProtocol = "TCP"
         d.Pod.ContainerPort = 80
 
-	err := k8devel.CreateDeployment(&c, &d)
+	err := deployment.Create(&c, &d)
         if err != nil {
                 logrus.Fatal("exiting... failed to create: ", err)
         }

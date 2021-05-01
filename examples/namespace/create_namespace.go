@@ -17,15 +17,17 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel"
+	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/logschema"
+	"github.com/thekubeworld/k8devel/pkg/namespace"
         "github.com/sirupsen/logrus"
 )
 
 func main() {
-        k8devel.SetLogrusLogging()
+        logschema.SetLogrusLogging()
 
 	newNamespace := "newnamespace" // Put here your new namespace name
-	c := k8devel.Client{}
+	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
 
@@ -33,9 +35,9 @@ func main() {
         //      - $HOME/kubeconfig (Linux)
         //      - os.Getenv("USERPROFILE") (Windows)
         c.Connect()
-	_, err := k8devel.ExistsNamespace(&c, newNamespace)
+	_, err := namespace.Exists(&c, newNamespace)
         if err != nil {
-                err = k8devel.CreateNamespace(&c, newNamespace)
+                err = namespace.Create(&c, newNamespace)
                 if err != nil {
                         logrus.Fatal("exiting... failed to create: ", err)
                 }
