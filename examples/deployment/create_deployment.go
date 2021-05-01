@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-        k8devel.SetLogrusLogging()
+        logschema.SetLogrusLogging()
 
 	newDeployment := "newdeployment" // Put here the new deployment name
 	namespace := "default" // Put here the namespace name
