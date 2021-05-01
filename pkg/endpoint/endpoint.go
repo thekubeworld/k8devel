@@ -28,6 +28,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/util"
 )
 
 // Instance type refers to the Endpoint object
@@ -132,7 +133,7 @@ func Create(c *client.Client, e *Instance) error {
 			e.Name,
 			e.Namespace)
 
-	proto, err := DetectContainerPortProtocol(e.EndpointPort.Protocol)
+	proto, err := util.DetectContainerPortProtocol(e.EndpointPort.Protocol)
         if err != nil {
                 logrus.Fatal(err)
         }
@@ -219,7 +220,7 @@ func Show(c *client.Client, endpoint string, namespace string) error {
 // Return:
 //	- error or nil
 func Delete(c *client.Client, endpoint string, namespace string) error {
-	inst := Endpoint{Name: endpoint, Namespace: namespace}
+	inst := Instance{Name: endpoint, Namespace: namespace}
 
         _, err := c.Clientset.CoreV1().Endpoints(inst.Namespace).
                 Get(context.TODO(), inst.Name, metav1.GetOptions{})
