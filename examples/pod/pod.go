@@ -19,6 +19,7 @@ package main
 import (
 	"github.com/thekubeworld/k8devel/pkg/client"
         "github.com/thekubeworld/k8devel/pkg/logschema"
+        "github.com/thekubeworld/k8devel/pkg/pod"
         "github.com/sirupsen/logrus"
 )
 
@@ -30,7 +31,7 @@ func main() {
 
 	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+        c.TimeoutTaksInSec = 20
 
 	// Connect to cluster from:
         //      - $HOME/kubeconfig (Linux)
@@ -41,10 +42,13 @@ func main() {
                 Name: containerName,
                 Namespace: namespace,
                 Image: "nginx",
-                Command: PodCommandInitBash,
-                CommandArgs: SleepOneDay,
+		LabelKey: "app",
+		LabelValue: "foobar",
         }
 
-        pod.Create(&c, &p)
+	err := pod.Create(&c, &p)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 	logrus.Infof("Pod %s namespace %s created!", p.Name, p.Namespace)
 }
