@@ -1,7 +1,9 @@
 name: Mirror K8sbykeshed
 on:
-  push:
-    branches: [ master ]
+  workflow_dispatch:
+  schedule:
+    # Daily, 3:00pm
+    - cron: '00 15 * * *'
 
 jobs:
   to_K8sbykeshed:
