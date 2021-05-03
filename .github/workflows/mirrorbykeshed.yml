@@ -2,8 +2,7 @@ name: Mirror K8sbykeshed
 on:
   workflow_dispatch:
   schedule:
-    # Daily, 3:00pm
-    - cron: '00 15 * * *'
+    - cron:  '*/15 * * * *'    # At every 15 minutes
 
 jobs:
   to_K8sbykeshed:
