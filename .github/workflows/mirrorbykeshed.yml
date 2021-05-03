@@ -9,13 +9,13 @@ jobs:
   to_K8sbykeshed:
     runs-on: ubuntu-latest
     steps:
-      - name: sycnmaster
+      - name: sycnmain
         uses: wei/git-sync@v3
         with:
           source_repo: "thekubeworld/k8devel"
-          source_branch: "master"
+          source_branch: "main"
           destination_repo: "K8sbykeshed/k8devel"
-          destination_branch: "master"
+          destination_branch: "main"
       - name: synctags
         uses: wei/git-sync@v3
         with:
