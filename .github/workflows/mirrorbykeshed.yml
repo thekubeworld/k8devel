@@ -20,7 +20,7 @@ jobs:
       - name: synctags
         uses: wei/git-sync@v3
         with:
-          source_repo: "github.com:thekubeworld/k8devel.git"
+          source_repo: "git@github.com:thekubeworld/k8devel.git"
           source_branch: "refs/tags/*"
           destination_repo: "git@github.com:K8sbykeshed/k8devel.git"
           destination_branch: "refs/tags/*"
