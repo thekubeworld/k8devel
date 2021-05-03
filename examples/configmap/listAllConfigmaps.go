@@ -18,6 +18,7 @@ package main
 
 import (
 	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/emoji"
 	"github.com/thekubeworld/k8devel/pkg/configmap"
 	"github.com/thekubeworld/k8devel/pkg/logschema"
         "github.com/sirupsen/logrus"
@@ -25,7 +26,7 @@ import (
 
 func main() {
         logschema.SetLogrusLogging()
-
+	e := emoji.LoadEmojis()
 	c := client.Client{}
         c.NumberMaxOfAttemptsPerTask = 10
         c.TimeoutTaksInSec = 2
@@ -47,5 +48,8 @@ func main() {
 		}
 		logrus.Infof("\n")
 	}
-	logrus.Infof("Number total if configmaps: %v", len(configMapList.Items))
+	logrus.Infof("Number total if configmaps: %v %s %s",
+		len(configMapList.Items),
+		emoji.Show(e.Rocket),
+		emoji.Show(e.Collision))
 }
