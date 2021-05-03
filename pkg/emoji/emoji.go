@@ -99,8 +99,7 @@ func LoadEmojis() Type {
 	return Emojis
 }
 
-// UnquoteCode will unquote code for the
-// emoji
+// Show will unquote code for the emoji
 //
 //	Table of codes:
 //	http://www.unicode.org/emoji/charts/emoji-list.html
