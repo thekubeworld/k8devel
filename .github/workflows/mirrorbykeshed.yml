@@ -12,7 +12,7 @@ jobs:
       - name: sycnmain
         uses: wei/git-sync@v3
         with:
-          source_repo: https://${{GITHUB_TOKEN}}@github.com:thekubeworld/k8devel.git
+          source_repo: "github.com:thekubeworld/k8devel.git"
           source_branch: "main"
           destination_repo: "git@github.com:K8sbykeshed/k8devel.git"
           destination_branch: "main"
