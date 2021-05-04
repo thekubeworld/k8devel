@@ -52,7 +52,12 @@ func SaveCurrentFirewallState(c *client.Client,
 		return "", err
 	}
 
-	filesaved, err := firewall.Save(&c,
+	podname, err = FindKubeProxyPod(c, podname, namespace)
+	if err != nil {
+		return "", err
+	}
+
+	filesaved, err := firewall.Save(c,
 		mode,
 		podname,
 		namespace)
@@ -61,7 +66,7 @@ func SaveCurrentFirewallState(c *client.Client,
 }
 
 
-// findKubeproxyPod will return one of the daemonsets
+// FindKubeProxyPod will return one of the daemonsets
 // pods names for kubeproxy so we can connect to pod
 // and execute commands or other actions
 //
@@ -74,17 +79,17 @@ func SaveCurrentFirewallState(c *client.Client,
 //     the first kube-proxy pod found from the daemonsets
 //	or error
 //     
-func FindKubeproxyPod(c *client.Client,
+func FindKubeProxyPod(c *client.Client,
 			podname string,
 			namespace string) (string, error) {
 	// Validation
-	kyPods, kyNumberPods := pod.FindPodsWithNameContains(&c,
+	kyPods, kyNumberPods := pod.FindPodsWithNameContains(c,
 		podname, namespace)
         if kyNumberPods < 0 {
-		return errros.New(
+		return "", errors.New(
 			"exiting... unable to find kube-proxy pod..")
         }
-	return kypods[0], nil
+	return kyPods[0], nil
 }
 
 // DetectKubeProxyMode will detect kube-proxy mode
@@ -103,10 +108,10 @@ func DetectKubeProxyMode(c *client.Client,
 		podname string,
 		namespace string) (string, error) {
 
-	// make sure we find a kube-proxy pod
-	_, err := findKubeproxyPod(podname, namespace)
+	// make sure we find at least one kube-proxy pod
+	_, err := FindKubeProxyPod(c, podname, namespace)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Get configmapname from kube-proxy

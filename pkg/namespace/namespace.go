@@ -21,7 +21,6 @@ import (
 
 	v1 "k8s.io/api/core/v1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-        "github.com/sirupsen/logrus"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 
@@ -57,8 +56,6 @@ func Delete(c *client.Client, namespace string) error {
 //     error or nil
 //     
 func Create(c *client.Client, namespace string) error {
-        logrus.Infof("Creating namespace: %s", namespace)
-
         ns := &v1.Namespace {
                 ObjectMeta: metav1.ObjectMeta {
                 Name: namespace,
@@ -75,8 +72,6 @@ func Create(c *client.Client, namespace string) error {
         if err != nil {
                 return err
         }
-        logrus.Infof("Created namespace: %s", c.Namespace)
-
         return nil
 }
 

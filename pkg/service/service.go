@@ -19,10 +19,10 @@ limitations under the License.
 import (
 	"context"
 	"time"
+	"fmt"
 	v1 "k8s.io/api/core/v1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"github.com/sirupsen/logrus"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
@@ -74,8 +74,7 @@ func Delete(c *client.Client, service string, namespace string) error {
 		return err
 	}
 
-	logrus.Info("\n")
-	logrus.Infof("Deleting service: %s namespace: %s...",
+	fmt.Printf("Deleting service: %s namespace: %s...",
 		service,
 		namespace)
 
@@ -83,7 +82,7 @@ func Delete(c *client.Client, service string, namespace string) error {
 	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
 		_, err := Exists(c, service, namespace)
 		if err != nil {
-			logrus.Infof("Deleted service: %s namespace: %s",
+			fmt.Printf("Deleted service: %s namespace: %s",
 				service,
 				namespace)
 			break
@@ -198,11 +197,6 @@ func CreateClusterIP(c *client.Client, s *Instance) error {
                 },
         }
 
-	logrus.Infof("\n")
-	logrus.Infof("Creating service: %s namespace: %s",
-		s.Name,
-		c.Namespace)
-
         _, err := c.Clientset.CoreV1().Services(s.Namespace).Create(
                 context.TODO(),
 		service,
@@ -210,11 +204,6 @@ func CreateClusterIP(c *client.Client, s *Instance) error {
         if err != nil {
                 return err
         }
-
-	logrus.Infof("Created service: %s namespace: %s",
-		s.Name,
-		s.Namespace)
-
         return nil
 }
 
@@ -259,11 +248,6 @@ func CreateNodePort(c *client.Client, s *Instance) error {
                 service.Spec.IPFamilyPolicy = &requireDual
         }
 
-	logrus.Infof("\n")
-	logrus.Infof("Creating Nodeport service: %s namespace: %s",
-		s.Name,
-		c.Namespace)
-
         _, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
                 context.TODO(),
 		service,
@@ -271,11 +255,6 @@ func CreateNodePort(c *client.Client, s *Instance) error {
         if err != nil {
                 return err
         }
-
-	logrus.Infof("Created Nodeport service: %s namespace: %s",
-		s.Name,
-		s.Namespace)
-
         return nil
 }
 
@@ -318,11 +297,6 @@ func CreateLoadBalancer(c *client.Client, s *Instance) error {
                 service.Spec.IPFamilyPolicy = &requireDual
         }
 
-	logrus.Infof("\n")
-	logrus.Infof("Creating LoadBalancer service: %s namespace: %s",
-		s.Name,
-		c.Namespace)
-
         _, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
                 context.TODO(),
 		service,
@@ -330,10 +304,5 @@ func CreateLoadBalancer(c *client.Client, s *Instance) error {
         if err != nil {
                 return err
         }
-
-	logrus.Infof("Created LoadBalancer service: %s namespace: %s",
-		s.Name,
-		s.Namespace)
-
         return nil
 }

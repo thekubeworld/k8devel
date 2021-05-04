@@ -31,8 +31,6 @@ import (
 
 	v1 "k8s.io/api/core/v1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/sirupsen/logrus"
 )
 
 // Instance type refers to the Pod object
@@ -60,8 +58,6 @@ func ExecCmd(c *client.Client,
 		nameSpace string,
 		cmd []string) (bytes.Buffer, bytes.Buffer, error) {
 
-	logrus.Infof("\n")
-	logrus.Infof("Executing command: %s", cmd)
 	restClient := c.Clientset.CoreV1().RESTClient()
 
 	req := restClient.Post().Resource("pods").Name(podName).
@@ -161,7 +157,6 @@ func FindPodsWithNameContains(c *client.Client,
 //	bool or error
 func isPodRunning(c *client.Client, podname, namespace string) wait.ConditionFunc {
 	return func() (bool, error) {
-		logrus.Infof(".") // progress bar
 		pod, err := c.Clientset.CoreV1().Pods(namespace).Get(
 			context.TODO(),
 			podname,
@@ -270,7 +265,6 @@ func Create(c *client.Client, p *Instance) error {
                 return err
         }
 
-	logrus.Infof("Creating pod: %s namespace: %s", p.Name, p.Namespace)
 	err = WaitForPodInRunningState(c, p.Name, p.Namespace)
 	if err != nil {
 		return err

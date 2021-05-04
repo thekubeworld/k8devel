@@ -18,11 +18,11 @@ limitations under the License.
 
 import (
 	"context"
+	"fmt"
 	"time"
 	v1 "k8s.io/api/core/v1"
 	apiv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/sirupsen/logrus"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
@@ -57,7 +57,7 @@ func Create(c *client.Client, d *Instance) error {
         deployClient := c.Clientset.AppsV1().Deployments(d.Namespace)
 	podProtocol, err := util.DetectContainerPortProtocol(d.Pod.ContainerPortProtocol)
 	if err != nil {
-		logrus.Fatal(err)
+		return err
 	}
 
         deployment := &apiv1.Deployment {
@@ -97,18 +97,13 @@ func Create(c *client.Client, d *Instance) error {
         }
 
 	// Create Deployment
-	logrus.Infof("Creating deployment: %s", d.Name)
-	result, err := deployClient.Create(
+	_, err = deployClient.Create(
 		context.TODO(),
 		deployment,
 		metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
-	logrus.Infof("Created deployment: %s namespace: %s",
-		result.GetObjectMeta().GetName(),
-		d.Namespace)
-
 	return nil
 }
 
@@ -127,8 +122,7 @@ func Delete(c *client.Client, deployment string, namespace string) error {
                 return err
         }
 
-	logrus.Info("\n")
-        logrus.Infof("Deleting deployment: %s namespace: %s...",
+        fmt.Printf("Deleting deployment: %s namespace: %s...\n",
                 deployment,
                 namespace)
 
@@ -136,7 +130,7 @@ func Delete(c *client.Client, deployment string, namespace string) error {
         for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
                 _, err := Exists(c, deployment, namespace)
                 if err != nil {
-                        logrus.Infof("Deleted deployment: %s namespace: %s",
+                        fmt.Printf("Deleted deployment: %s namespace: %s\n",
                                 deployment,
                                 namespace)
                         break
