@@ -58,12 +58,6 @@ func Save(c *client.Client,
 		return nil, err
         }
 
-
-	fmt.Println("=========")
-	fmt.Println(container)
-	fmt.Println(namespace)
-	fmt.Println(cmdSave)
-	fmt.Println("=========")
 	stdout, _, err := pod.ExecCmd(c,
               container,
               namespace,
@@ -75,6 +69,5 @@ func Save(c *client.Client,
         fileRef.Write(stdout.Bytes())
         fileRef.Sync()
 
-	fmt.Println("volteiiiiiiiii")
 	return fileRef, nil
 }
