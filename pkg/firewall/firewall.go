@@ -1,4 +1,4 @@
-package iptables
+package firewall
 
 /*
 Copyright 2015 The Kubernetes Authors.
