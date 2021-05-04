@@ -19,74 +19,18 @@ limitations under the License.
 
 import (
 	"os"
+	"errors"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 	"github.com/thekubeworld/k8devel/pkg/util"
 )
 
-// IPTables type refers to the iptables object
-type Instance struct {
-	ReadNatTable []string
-	ReadFilterTable []string
-	ReadNatTableKubeServices []string
-	Save []string
-}
-
-// LoadPreDefinedIPTables loads several pre-defined
-// iptables commands.
+// Save will save the current state of firewall
 //
 // Args:
-//	None
-//
-// Returns:
-//	Filled IPTablesIPTables struct with commands
-//
-func LoadPreDefinedCommands() Instance {
-	IPTablesCmd := Instance{}
-
-	IPTablesCmd.ReadNatTable = []string {
-		"iptables",
-		"-w",
-		"-t",
-		"nat",
-		"-L",
-		"-n",
-		"-v",
-	}
-
-	IPTablesCmd.ReadFilterTable = []string {
-		"iptables",
-		"-w",
-		"-t",
-		"filter",
-		"-L",
-		"-n",
-		"-v",
-	}
-
-	IPTablesCmd.ReadNatTableKubeServices = []string {
-		"iptables",
-		"-w",
-		"-L",
-		"-n",
-		"-v",
-		"KUBE-SERVICES",
-		"-t",
-		"nat",
-	}
-
-	IPTablesCmd.Save = []string {
-		"iptables-save",
-	}
-
-	return IPTablesCmd
-}
-
-// IPTablesSave will save the current state of NAT table
-// from the container provider in the parameter
-//
-// Args:
+//	client struct
+//	firewallMode - iptables or ipvs
 //	container name	
 //	namespace
 //
@@ -94,8 +38,21 @@ func LoadPreDefinedCommands() Instance {
 //	file object
 //	filesystem which triggered this method
 //
-func Save(c *client.Client, i *Instance, container string, namespace string)(*os.File, error) {
-	fileRef, err := util.CreateTempFile(os.TempDir(), "iptables")
+func Save(c *client.Client,
+		firewallMode string,
+		container string,
+		namespace string)(*os.File, error) {
+
+	var cmdSave []string
+	if firewallMode == "iptables" {
+		cmdSave = append(cmdSave, "iptables-save")
+	} else if firewallMode == "ipvs" {
+		cmdSave = append(cmdSave, "ipvs-save")
+	} else {
+		return nil, errors.New("unknown firewall mode")
+	}
+
+	fileRef, err := util.CreateTempFile(os.TempDir(), "firewall")
         if err != nil {
 		return nil, err
         }
@@ -103,7 +60,7 @@ func Save(c *client.Client, i *Instance, container string, namespace string)(*os
 	stdout, _, err := pod.ExecCmd(c,
               container,
               namespace,
-              i.Save)
+              cmdSave)
         if err != nil {
 		return nil, err
         }

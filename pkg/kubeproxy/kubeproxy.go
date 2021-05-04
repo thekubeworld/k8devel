@@ -24,34 +24,108 @@ import (
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/firewall"
+	"github.com/thekubeworld/k8devel/pkg/pod"
 )
+
+// SaveCurrentFirewallState will save the current state
+// from the kubeproxy pod
+//
+// Args:
+//	- Pointer to a Client struct
+//	- podname A substring of kube-proxy pod name
+//	- namespace
+//
+// Returns:
+//	filename storing the firewall rules or error
+//     
+func SaveCurrentFirewallState(c *client.Client,
+                configmapname string,
+                podname string,
+                namespace string) (string, error) {
+
+	mode, err := DetectKubeProxyMode(c,
+		configmapname,
+		podname,
+		namespace)
+	if err != nil {
+		return "", err
+	}
+
+	filesaved, err := firewall.Save(&c,
+		mode,
+		podname,
+		namespace)
+
+	return filesaved.Name(), nil
+}
+
+
+// findKubeproxyPod will return one of the daemonsets
+// pods names for kubeproxy so we can connect to pod
+// and execute commands or other actions
+//
+// Args:
+//	- Pointer to a Client struct
+//	- podname A substring of kube-proxy pod name
+//	- namespace
+//
+// Returns:
+//     the first kube-proxy pod found from the daemonsets
+//	or error
+//     
+func FindKubeproxyPod(c *client.Client,
+			podname string,
+			namespace string) (string, error) {
+	// Validation
+	kyPods, kyNumberPods := pod.FindPodsWithNameContains(&c,
+		podname, namespace)
+        if kyNumberPods < 0 {
+		return errros.New(
+			"exiting... unable to find kube-proxy pod..")
+        }
+	return kypods[0], nil
+}
 
 // DetectKubeProxyMode will detect kube-proxy mode
 //
 // Args:
 //	- Pointer to a Client struct
-//	- configmap
+//	- configmapname
+//	- podname
 //	- namespace
 //
 // Returns:
-//     string (namespace name) OR error type
+//     string (ipvs or iptables) OR error type
 //     
 func DetectKubeProxyMode(c *client.Client,
-		configmap string,
+		configmapname string,
+		podname string,
 		namespace string) (string, error) {
 
+	// make sure we find a kube-proxy pod
+	_, err := findKubeproxyPod(podname, namespace)
+	if err != nil {
+		return err
+	}
+
+	// Get configmapname from kube-proxy
 	kproxyConfig, err := c.Clientset.CoreV1().ConfigMaps(namespace).Get(
 		context.TODO(),
-		configmap,
+		configmapname,
 		metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
 
-	if strings.Contains(fmt.Sprint(kproxyConfig.Data), "mode: iptables") {
-                return "iptables", nil
+	// Detect if it's iptables
+	if strings.Contains(
+			fmt.Sprint(kproxyConfig.Data),
+			"mode: iptables") {
+		return "iptables", nil
         }
 
+	// Detect if it's ipvs
 	if strings.Contains(fmt.Sprint(kproxyConfig.Data), "mode: ipvs") {
                 return "ipvs", nil
         }
