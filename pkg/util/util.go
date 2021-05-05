@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"time"
 	"math/rand"
+	"strings"
 	"os/exec"
 	"github.com/sirupsen/logrus"
 )
@@ -40,10 +41,10 @@ import (
 // Returns:
 //	v1.ProtocolUDP, v1.ProtocolTCP or error
 func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
-        switch protocol {
-        case "TCP":
+        switch strings.ToLower(protocol) {
+        case "tcp":
                 return v1.ProtocolTCP, nil
-        case "UDP":
+        case "udp":
                 return v1.ProtocolUDP, nil
         }
         return "", errors.New("unknown protocol")
