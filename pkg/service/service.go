@@ -18,11 +18,11 @@ limitations under the License.
 
 import (
 	"context"
-	"time"
 	"fmt"
 	v1 "k8s.io/api/core/v1"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"time"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
@@ -30,21 +30,22 @@ import (
 
 // Service type refers to the Service object
 type Instance struct {
-        Name string
-        Namespace string
-        LabelKey string
-        LabelValue string
-        Port int32
-        PortName string
-        PortProtocol string
-        SelectorKey string
-        SelectorValue string
-        DualStackEnabled bool
-        TargetPort int
-        NodePort int32
-        LoadBalancerIP string
+	Name             string
+	Namespace        string
+	LabelKey         string
+	LabelValue       string
+	Port             int32
+	PortName         string
+	PortProtocol     string
+	SelectorKey      string
+	SelectorValue    string
+	DualStackEnabled bool
+	TargetPort       int
+	NodePort         int32
+	LoadBalancerIP   string
+	ExternalName     string
 
-        ClusterIP string
+	ClusterIP string
 	// Possible values for clusterIP:
 	//   - None: headless service when proxying is not required
 	//   - empty string or "": Auto Generated
@@ -134,17 +135,17 @@ func Delete(c *client.Client, service string, namespace string) error {
 // Returns:
 //      - the IP as string or error
 func GetIP(c *client.Client,
-                svcName string,
-                nameSpace string) (string, error) {
+	svcName string,
+	nameSpace string) (string, error) {
 
-        svc, err := c.Clientset.CoreV1().Services(nameSpace).Get(
-                context.TODO(),
-                svcName,
-                metav1.GetOptions{})
-        if err != nil {
-                return "", err
-        }
-        return svc.Spec.ClusterIP, nil
+	svc, err := c.Clientset.CoreV1().Services(nameSpace).Get(
+		context.TODO(),
+		svcName,
+		metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+	return svc.Spec.ClusterIP, nil
 
 }
 
@@ -155,56 +156,56 @@ func GetIP(c *client.Client,
 //
 // Returns:
 //     string (namespace name) OR error type
-//     
+//
 func Exists(c *client.Client, service string, namespace string) (string, error) {
 	exists, err := c.Clientset.CoreV1().Services(namespace).
 		Get(context.TODO(), service, metav1.GetOptions{})
 	if err != nil {
-                return "", err
-        }
+		return "", err
+	}
 
-        return exists.Name, nil
+	return exists.Name, nil
 }
 
 // CreateClusterIP creates a service using the values
-// from the Service struct via the Client.Clientset 
+// from the Service struct via the Client.Clientset
 //
 // Args:
 //    Service - Service struct
-//    Client  - Client strucut
+//    Client  - Client struct
 //
 //   Returns:
 //      error or nil
 func CreateClusterIP(c *client.Client, s *Instance) error {
-        service := &v1.Service {
-                ObjectMeta: metav1.ObjectMeta {
-                        Name: s.Name,
-                        Namespace: s.Namespace,
-                        Labels: map[string]string {
-                                s.LabelKey: s.LabelValue,
-                        },
-                },
-                Spec: v1.ServiceSpec {
-                        Ports: []v1.ServicePort{
-                        {
-                                Port: s.Port,
-                        },
-                },
-                Selector: map[string]string {
-                        s.SelectorKey: s.SelectorValue,
-                },
-                        ClusterIP: s.ClusterIP,
-                },
-        }
+	service := &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      s.Name,
+			Namespace: s.Namespace,
+			Labels: map[string]string{
+				s.LabelKey: s.LabelValue,
+			},
+		},
+		Spec: v1.ServiceSpec{
+			Ports: []v1.ServicePort{
+				{
+					Port: s.Port,
+				},
+			},
+			Selector: map[string]string{
+				s.SelectorKey: s.SelectorValue,
+			},
+			ClusterIP: s.ClusterIP,
+		},
+	}
 
-        _, err := c.Clientset.CoreV1().Services(s.Namespace).Create(
-                context.TODO(),
+	_, err := c.Clientset.CoreV1().Services(s.Namespace).Create(
+		context.TODO(),
 		service,
-                metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
-        return nil
+		metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CreateNodePort creates a service using the values
@@ -212,50 +213,50 @@ func CreateClusterIP(c *client.Client, s *Instance) error {
 //
 // Args:
 //    Service - Service struct
-//    Client  - Client strucut
+//    Client  - Client struct
 //
 //   Returns:
 //      error or nil
 func CreateNodePort(c *client.Client, s *Instance) error {
 	serviceProtocol, err := util.DetectContainerPortProtocol(s.PortProtocol)
-        service := &v1.Service {
-                ObjectMeta: metav1.ObjectMeta {
-                        Name: s.Name,
-                        Namespace: s.Namespace,
-                        Labels: map[string]string {
-                                s.LabelKey: s.LabelValue,
-                        },
-                },
-                Spec: v1.ServiceSpec {
-                        Type: v1.ServiceTypeNodePort,
-                        Ports: []v1.ServicePort {
-                                {
-					Port: s.Port,
-					Name: s.PortName,
-					Protocol: serviceProtocol,
+	service := &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      s.Name,
+			Namespace: s.Namespace,
+			Labels: map[string]string{
+				s.LabelKey: s.LabelValue,
+			},
+		},
+		Spec: v1.ServiceSpec{
+			Type: v1.ServiceTypeNodePort,
+			Ports: []v1.ServicePort{
+				{
+					Port:       s.Port,
+					Name:       s.PortName,
+					Protocol:   serviceProtocol,
 					TargetPort: intstr.FromInt(s.TargetPort),
-					NodePort: s.NodePort,
+					NodePort:   s.NodePort,
 				},
-                },
-			Selector: map[string]string {
+			},
+			Selector: map[string]string{
 				s.SelectorKey: s.SelectorValue,
 			},
 		},
-        }
+	}
 
-        if s.DualStackEnabled {
-                requireDual := v1.IPFamilyPolicyRequireDualStack
-                service.Spec.IPFamilyPolicy = &requireDual
-        }
+	if s.DualStackEnabled {
+		requireDual := v1.IPFamilyPolicyRequireDualStack
+		service.Spec.IPFamilyPolicy = &requireDual
+	}
 
-        _, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
-                context.TODO(),
+	_, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
+		context.TODO(),
 		service,
-                metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
-        return nil
+		metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CreateLoadBalancer creates a service using the values
@@ -263,46 +264,70 @@ func CreateNodePort(c *client.Client, s *Instance) error {
 //
 // Args:
 //    Service - Service struct
-//    Client  - Client strucut
+//    Client  - Client struct
 //
 //   Returns:
 //      error or nil
 func CreateLoadBalancer(c *client.Client, s *Instance) error {
 	serviceProtocol, err := util.DetectContainerPortProtocol(s.PortProtocol)
-        service := &v1.Service {
-                ObjectMeta: metav1.ObjectMeta {
-                        Name: s.Name,
-                        Namespace: s.Namespace,
-                        Labels: map[string]string {
-                                s.LabelKey: s.LabelValue,
-                        },
-                },
-                Spec: v1.ServiceSpec {
-                        Type: v1.ServiceTypeLoadBalancer,
-                        Ports: []v1.ServicePort {
-                                {
-					Port: s.Port,
-					Name: s.PortName,
+	service := &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      s.Name,
+			Namespace: s.Namespace,
+			Labels: map[string]string{
+				s.LabelKey: s.LabelValue,
+			},
+		},
+		Spec: v1.ServiceSpec{
+			Type: v1.ServiceTypeLoadBalancer,
+			Ports: []v1.ServicePort{
+				{
+					Port:     s.Port,
+					Name:     s.PortName,
 					Protocol: serviceProtocol,
 				},
 			},
-			Selector: map[string]string {
+			Selector: map[string]string{
 				s.SelectorKey: s.SelectorValue,
 			},
 			LoadBalancerIP: s.LoadBalancerIP,
 		},
-        }
-        if s.DualStackEnabled {
-                requireDual := v1.IPFamilyPolicyRequireDualStack
-                service.Spec.IPFamilyPolicy = &requireDual
-        }
+	}
+	if s.DualStackEnabled {
+		requireDual := v1.IPFamilyPolicyRequireDualStack
+		service.Spec.IPFamilyPolicy = &requireDual
+	}
 
-        _, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
-                context.TODO(),
+	_, err = c.Clientset.CoreV1().Services(s.Namespace).Create(
+		context.TODO(),
 		service,
-                metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
-        return nil
+		metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// CreateExternalName creates a service using the values
+// from the Service struct via the Client.Clientset
+//
+// Args:
+//    Service - Service struct
+//    Client  - Client struct
+//
+//   Returns:
+//      error or nil
+func CreateExternalName(c *client.Client, s *Instance) error {
+	service := &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      s.Name,
+			Namespace: s.Namespace,
+		},
+		Spec: v1.ServiceSpec{
+			Type:         v1.ServiceTypeExternalName,
+			ExternalName: s.ExternalName,		},
+	}
+
+	_, err := c.Clientset.CoreV1().Services(s.Namespace).Create(context.TODO(), service, metav1.CreateOptions{})
+	return err
 }
