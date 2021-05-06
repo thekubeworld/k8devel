@@ -24,6 +24,7 @@ import(
     v1 "k8s.io/api/core/v1"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
     appsv1 "k8s.io/api/apps/v1"
+    v1beta1 "k8s.io/api/policy/v1beta1"
     "k8s.io/client-go/kubernetes/scheme"
     "k8s.io/apimachinery/pkg/runtime"
     "github.com/thekubeworld/k8devel/pkg/client"
@@ -117,7 +118,20 @@ func YAML(c *client.Client, yamlInput []byte) ([]string) {
 						obj.(*appsv1.Deployment).Name,
 						" created"))
 			}
-
+		case *v1beta1.PodSecurityPolicy:
+			_, err = c.Clientset.PolicyV1beta1().PodSecurityPolicies().Create(
+			                context.TODO(),
+					obj.(*v1beta1.PodSecurityPolicy),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("podsecuritypolicy ",
+						obj.(*v1beta1.PodSecurityPolicy).Name,
+						" created"))
+			}
 		default:
 			output = append(
 				output,
