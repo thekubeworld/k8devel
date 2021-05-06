@@ -42,12 +42,19 @@ type Instance struct {
 //     error or nil
 //     
 func Create(c *client.Client, i *Instance) error {
+
+	// by defaut we set AutomountServiceAccountToken as true
+	autoservice := true
+
+	if i.AutomountServiceAccountToken == false {
+		autoservice = i.AutomountServiceAccountToken
+	}
 	SA := &v1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: i.Namespace,
 			Name: i.Name,
                 },
-                AutomountServiceAccountToken: &i.AutomountServiceAccountToken,
+                AutomountServiceAccountToken: &autoservice,
         }
         _, err := c.Clientset.CoreV1().ServiceAccounts(i.Namespace).Create(
 			context.TODO(),
