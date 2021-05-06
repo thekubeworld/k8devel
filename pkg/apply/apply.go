@@ -25,6 +25,7 @@ import(
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
     appsv1 "k8s.io/api/apps/v1"
     v1beta1 "k8s.io/api/policy/v1beta1"
+    rbacv1 "k8s.io/api/rbac/v1"
     "k8s.io/client-go/kubernetes/scheme"
     "k8s.io/apimachinery/pkg/runtime"
     "github.com/thekubeworld/k8devel/pkg/client"
@@ -56,6 +57,8 @@ func decode(data []byte) (runtime.Object, error) {
 // Returns:
 //	- None
 //     
+// TODO: Can we simplify the switch?
+//
 func YAML(c *client.Client, yamlInput []byte) ([]string) {
 	var output []string
 	yamlFiles := bytes.Split(yamlInput, []byte(yamlDelimiter))
@@ -104,6 +107,20 @@ func YAML(c *client.Client, yamlInput []byte) ([]string) {
 						obj.(*v1.Namespace).Name,
 						" created"))
 			}
+		case *v1.ConfigMap:
+			_, err = c.Clientset.CoreV1().ConfigMaps(obj.(*v1.ConfigMap).Namespace).Create(
+			                context.TODO(),
+					obj.(*v1.ConfigMap),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("configmap ",
+						obj.(*v1.ConfigMap).Name,
+						" created"))
+			}
 		case *appsv1.Deployment:
 			  _, err = c.Clientset.AppsV1().Deployments(obj.(*appsv1.Deployment).Namespace).Create(
 					context.TODO(),
@@ -114,8 +131,36 @@ func YAML(c *client.Client, yamlInput []byte) ([]string) {
 			} else {
 				output = append(
 					output,
-					fmt.Sprint("namespace ",
+					fmt.Sprint("deployment ",
 						obj.(*appsv1.Deployment).Name,
+						" created"))
+			}
+		case *appsv1.DaemonSet:
+			  _, err = c.Clientset.AppsV1().DaemonSets(obj.(*appsv1.DaemonSet).Namespace).Create(
+					context.TODO(),
+					obj.(*appsv1.DaemonSet),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("daemonset ",
+						obj.(*appsv1.DaemonSet).Name,
+						" created"))
+			}
+		case *appsv1.StatefulSet:
+			  _, err = c.Clientset.AppsV1().StatefulSets(obj.(*appsv1.StatefulSet).Namespace).Create(
+					context.TODO(),
+					obj.(*appsv1.StatefulSet),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("statefulset ",
+						obj.(*appsv1.StatefulSet).Name,
 						" created"))
 			}
 		case *v1beta1.PodSecurityPolicy:
@@ -130,6 +175,62 @@ func YAML(c *client.Client, yamlInput []byte) ([]string) {
 					output,
 					fmt.Sprint("podsecuritypolicy ",
 						obj.(*v1beta1.PodSecurityPolicy).Name,
+						" created"))
+			}
+		case *rbacv1.ClusterRole:
+			_, err = c.Clientset.RbacV1().ClusterRoles().Create(
+			                context.TODO(),
+					obj.(*rbacv1.ClusterRole),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("clusterrole ",
+						obj.(*rbacv1.ClusterRole).Name,
+						" created"))
+			}
+		case *rbacv1.RoleBinding:
+			_, err = c.Clientset.RbacV1().RoleBindings(obj.(*rbacv1.RoleBinding).Namespace).Create(
+			                context.TODO(),
+					obj.(*rbacv1.RoleBinding),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("rolebinding ",
+						obj.(*rbacv1.RoleBinding).Name,
+						" created"))
+			}
+		case *rbacv1.ClusterRoleBinding:
+			_, err = c.Clientset.RbacV1().ClusterRoleBindings().Create(
+			                context.TODO(),
+					obj.(*rbacv1.ClusterRoleBinding),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("clusterrolebinding ",
+						obj.(*rbacv1.ClusterRoleBinding).Name,
+						" created"))
+			}
+		case *rbacv1.Role:
+			_, err = c.Clientset.RbacV1().Roles(obj.(*rbacv1.Role).Namespace).Create(
+			                context.TODO(),
+					obj.(*rbacv1.Role),
+					metav1.CreateOptions{})
+			if err != nil {
+				output = append(output, fmt.Sprint(err))
+			} else {
+				output = append(
+					output,
+					fmt.Sprint("role ",
+						obj.(*rbacv1.Role).Name,
 						" created"))
 			}
 		default:
