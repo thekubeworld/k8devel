@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 	v1 "k8s.io/api/core/v1"
-	apiv1 "k8s.io/api/apps/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
@@ -60,11 +60,11 @@ func Create(c *client.Client, d *Instance) error {
 		return err
 	}
 
-        deployment := &apiv1.Deployment {
+        deployment := &appsv1.Deployment {
                 ObjectMeta: metav1.ObjectMeta{
                         Name: d.Name,
                 },
-                Spec: apiv1.DeploymentSpec{
+                Spec: appsv1.DeploymentSpec{
                         Replicas: &d.Replicas,
                         Selector: &metav1.LabelSelector{
                                 MatchLabels: map[string]string{
