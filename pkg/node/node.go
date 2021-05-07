@@ -19,13 +19,14 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
 
-// Node type refers to the ConfigMap object
+// Instance type refers to the ConfigMap object
 type Instance struct {
 	Name      string
 	Namespace string

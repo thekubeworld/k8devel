@@ -20,8 +20,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/firewall"
@@ -86,7 +87,7 @@ func FindKubeProxyPod(c *client.Client,
 		podname, namespace)
 	if kyNumberPods < 0 {
 		return "", errors.New(
-			"exiting... unable to find kube-proxy pod..")
+			"exiting... unable to find kube-proxy pod")
 	}
 	return kyPods[0], nil
 }

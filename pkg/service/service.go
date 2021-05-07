@@ -19,16 +19,17 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
+	"time"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"time"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
 )
 
-// Service type refers to the Service object
+// Instance type refers to the Service object
 type Instance struct {
 	Name             string
 	Namespace        string

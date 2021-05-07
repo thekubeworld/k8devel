@@ -228,7 +228,7 @@ func Exists(c *client.Client, podName string, namespace string) (string, error) 
 	return exists.Name, nil
 }
 
-// CreatePod will create a POD
+// Create will create a POD
 //
 // Args:
 //      - Client struct from client module

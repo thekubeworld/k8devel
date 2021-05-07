@@ -27,6 +27,7 @@ import (
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
 
+// Instance struct for secret
 type Instance struct {
 	Name      string
 	Namespace string
@@ -106,7 +107,7 @@ func detectSecretType(s string) (v1.SecretType, error) {
 	case "kubernetes.io/dockerconfigjson":
 		return v1.SecretTypeDockerConfigJson, nil
 	}
-	return "", errors.New("unknown secretType yet\n")
+	return nil, errors.New("unknown secretType yet")
 }
 
 // Exists will check if thsee secret  exists or not

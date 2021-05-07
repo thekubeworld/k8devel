@@ -21,6 +21,8 @@ import (
 	"strings"
 )
 
+// Type struct contain all types of emoji
+// available to use
 type Type struct {
 	Rocket             string // 🚀
 	ThumbsUp           string // 👍
