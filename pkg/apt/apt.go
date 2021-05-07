@@ -68,7 +68,7 @@ func InstallPackageInsidePod(c *client.Client,
 	packagename string) (string, error) {
 
 	Cmd := []string{"apt", "install"}
-	Cmd := append(Cmd, packagename)
+	Cmd = append(Cmd, packagename)
 
 	stdout, _, err := pod.ExecCmd(c,
 		container,
