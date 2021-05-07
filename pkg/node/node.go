@@ -17,18 +17,18 @@ limitations under the License.
 */
 
 import (
-	"fmt"
 	"context"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"fmt"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
 
 // Node type refers to the ConfigMap object
 type Instance struct {
-        Name string
-        Namespace string
+	Name      string
+	Namespace string
 }
 
 // GetIPFromNodes will list all ConfigMaps
@@ -50,5 +50,5 @@ func GetIPFromNodes(c *client.Client) ([]string, error) {
 		nodeip = nodes.Items[i].Status.Addresses
 		nodeList = append(nodeList, fmt.Sprint(nodeip[0].Address))
 	}
-        return nodeList, nil
+	return nodeList, nil
 }
