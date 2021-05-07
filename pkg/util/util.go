@@ -16,18 +16,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import (
-	"os"
-	"errors"
-	v1 "k8s.io/api/core/v1"
 	"bytes"
+	"errors"
+	"io"
 	"io/ioutil"
-	"time"
 	"math/rand"
-	"strings"
+	"net/http"
+	"os"
 	"os/exec"
+	"strings"
+	"time"
+
 	"github.com/sirupsen/logrus"
+	v1 "k8s.io/api/core/v1"
 )
 
 // DetectContainerPortProtocol is a helper for users
@@ -41,13 +43,13 @@ import (
 // Returns:
 //	v1.ProtocolUDP, v1.ProtocolTCP or error
 func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
-        switch strings.ToLower(protocol) {
-        case "tcp":
-                return v1.ProtocolTCP, nil
-        case "udp":
-                return v1.ProtocolUDP, nil
-        }
-        return "", errors.New("unknown protocol")
+	switch strings.ToLower(protocol) {
+	case "tcp":
+		return v1.ProtocolTCP, nil
+	case "udp":
+		return v1.ProtocolUDP, nil
+	}
+	return "", errors.New("unknown protocol")
 }
 
 // CompareFiles will compare two files, byte by byte
@@ -60,18 +62,18 @@ func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
 //   Returns:
 //      bool and error
 func CompareFiles(fileone string, filetwo string) (bool, error) {
-    f1, err := ioutil.ReadFile(fileone)
+	f1, err := ioutil.ReadFile(fileone)
 
-    if err != nil {
-	return false, err
-    }
+	if err != nil {
+		return false, err
+	}
 
-    f2, err := ioutil.ReadFile(filetwo)
-    if err != nil {
-	return true, err
-    }
+	f2, err := ioutil.ReadFile(filetwo)
+	if err != nil {
+		return true, err
+	}
 
-    return bytes.Equal(f1, f2), nil
+	return bytes.Equal(f1, f2), nil
 }
 
 // DiffCommand will diff two files
@@ -115,11 +117,39 @@ func DiffCommand(fileone string, filetwo string) ([]byte, error) {
 //   Returns:
 //      filename as string or error
 func CreateTempFile(dirname string, filename string) (*os.File, error) {
-	file, err := ioutil.TempFile(dirname, filename + ".*")
+	file, err := ioutil.TempFile(dirname, filename+".*")
 	if err != nil {
 		return nil, err
 	}
 	return file, nil
+}
+
+// DownloadFile will create temporary file
+//
+// Args:
+//    dirname - dir name
+//    filename - file name
+//
+//   Returns:
+//      filename as string or error
+func DownloadFile(url string) (string, error) {
+	out, err := CreateTempFile(os.TempDir(), "downloadedfile")
+	defer out.Close()
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return out.Name(), nil
 }
 
 // GenerateRandomString will generate a random string
