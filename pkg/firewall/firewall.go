@@ -18,7 +18,6 @@ limitations under the License.
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
