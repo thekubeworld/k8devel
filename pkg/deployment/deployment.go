@@ -19,10 +19,10 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
-	"time"
-	v1 "k8s.io/api/core/v1"
 	appsv1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
@@ -30,17 +30,17 @@ import (
 
 // Instance type refers to the Deployment object
 type Instance struct {
-	Name string
-	Namespace string
-	Replicas int32
-	LabelKey string
+	Name       string
+	Namespace  string
+	Replicas   int32
+	LabelKey   string
 	LabelValue string
-	Pod struct {
-		Name string
-		Image string
-		ContainerPortName string
-		ContainerPortProtocol string  // "TCP" or "UDP"
-		ContainerPort int32
+	Pod        struct {
+		Name                  string
+		Image                 string
+		ContainerPortName     string
+		ContainerPortProtocol string // "TCP" or "UDP"
+		ContainerPort         int32
 	}
 }
 
@@ -54,47 +54,47 @@ type Instance struct {
 //	- error
 func Create(c *client.Client, d *Instance) error {
 
-        deployClient := c.Clientset.AppsV1().Deployments(d.Namespace)
+	deployClient := c.Clientset.AppsV1().Deployments(d.Namespace)
 	podProtocol, err := util.DetectContainerPortProtocol(d.Pod.ContainerPortProtocol)
 	if err != nil {
 		return err
 	}
 
-        deployment := &appsv1.Deployment {
-                ObjectMeta: metav1.ObjectMeta{
-                        Name: d.Name,
-                },
-                Spec: appsv1.DeploymentSpec{
-                        Replicas: &d.Replicas,
-                        Selector: &metav1.LabelSelector{
-                                MatchLabels: map[string]string{
-                                        d.LabelKey: d.LabelValue,
-                                },
-                        },
-                        Template: v1.PodTemplateSpec{
-                                ObjectMeta: metav1.ObjectMeta{
-                                        Labels: map[string]string{
-                                                d.LabelKey: d.LabelValue,
-                                        },
-                                },
-                                Spec: v1.PodSpec{
-                                        Containers: []v1.Container{
-                                                {
-                                                        Name:  d.Pod.Name,
-                                                        Image: d.Pod.Image,
-                                                        Ports: []v1.ContainerPort{
-                                                                {
-                                                                        Name:          d.Pod.ContainerPortName,
-                                                                        Protocol:      podProtocol,
-                                                                        ContainerPort: d.Pod.ContainerPort,
-                                                                },
-                                                        },
-                                                },
-                                        },
-                                },
-                        },
-                },
-        }
+	deployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: d.Name,
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: &d.Replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					d.LabelKey: d.LabelValue,
+				},
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						d.LabelKey: d.LabelValue,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:  d.Pod.Name,
+							Image: d.Pod.Image,
+							Ports: []v1.ContainerPort{
+								{
+									Name:          d.Pod.ContainerPortName,
+									Protocol:      podProtocol,
+									ContainerPort: d.Pod.ContainerPort,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
 	// Create Deployment
 	_, err = deployClient.Create(
@@ -116,34 +116,34 @@ func Create(c *client.Client, d *Instance) error {
 // Return:
 //      - error or nil
 func Delete(c *client.Client, deployment string, namespace string) error {
-        _, err := c.Clientset.AppsV1().Deployments(namespace).
-                Get(context.TODO(), deployment, metav1.GetOptions{})
-        if err != nil {
-                return err
-        }
+	_, err := c.Clientset.AppsV1().Deployments(namespace).
+		Get(context.TODO(), deployment, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
 
-        fmt.Printf("Deleting deployment: %s namespace: %s...\n",
-                deployment,
-                namespace)
+	fmt.Printf("Deleting deployment: %s namespace: %s...\n",
+		deployment,
+		namespace)
 
-        // Double check service is removed
-        for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
-                _, err := Exists(c, deployment, namespace)
-                if err != nil {
-                        fmt.Printf("Deleted deployment: %s namespace: %s\n",
-                                deployment,
-                                namespace)
-                        break
-                }
+	// Double check service is removed
+	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
+		_, err := Exists(c, deployment, namespace)
+		if err != nil {
+			fmt.Printf("Deleted deployment: %s namespace: %s\n",
+				deployment,
+				namespace)
+			break
+		}
 		c.Clientset.AppsV1().Deployments(namespace).Delete(
 			context.TODO(),
 			deployment,
 			metav1.DeleteOptions{})
 
-                time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
-        }
+		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
+	}
 
-        return nil
+	return nil
 }
 
 // Exists will check if the service exists or not
@@ -159,9 +159,9 @@ func Delete(c *client.Client, deployment string, namespace string) error {
 func Exists(c *client.Client, deployment string, namespace string) (string, error) {
 	exists, err := c.Clientset.AppsV1().Deployments(namespace).
 		Get(context.TODO(), deployment, metav1.GetOptions{})
-        if err != nil {
-                return "", err
-        }
+	if err != nil {
+		return "", err
+	}
 
-        return exists.Name, nil
+	return exists.Name, nil
 }
