@@ -38,7 +38,6 @@ func GenerateRandomBytes(n int) ([]byte, error) {
 	return b, nil
 }
 
-
 // GenerateRandomString returns base64 encoded string
 //
 // Args:
