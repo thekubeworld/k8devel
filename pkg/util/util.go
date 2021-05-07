@@ -124,14 +124,13 @@ func CreateTempFile(dirname string, filename string) (*os.File, error) {
 	return file, nil
 }
 
-// DownloadFile will create temporary file
+// DownloadFile will download a file specified as temporary file
 //
 // Args:
-//    dirname - dir name
-//    filename - file name
+//    url - url to be download
 //
 //   Returns:
-//      filename as string or error
+//      path as string or error
 func DownloadFile(url string) (string, error) {
 	out, err := CreateTempFile(os.TempDir(), "downloadedfile")
 	defer out.Close()

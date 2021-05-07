@@ -28,28 +28,27 @@ import (
 func main() {
 	e := emoji.LoadEmojis()
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
-
-	s := secret.Instance {
-		Name: "mysecret",
+	s := secret.Instance{
+		Name:      "mysecret",
 		Namespace: "default",
-		Type: "Opaque",
-		Key: "myuser",
-		Value: "mypass",
+		Type:      "Opaque",
+		Key:       "myuser",
+		Value:     "mypass",
 	}
 
 	err := secret.Create(&c, &s)
 	if err != nil {
 		fmt.Printf("%s %s\n", emoji.Show(e.CrossMark), err)
 		os.Exit(1)
-        }
+	}
 	fmt.Printf("%s secret created %s, namespace %s, type: %s\n",
 		emoji.Show(e.Rocket),
 		s.Name,

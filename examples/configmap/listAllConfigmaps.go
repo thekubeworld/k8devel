@@ -17,29 +17,29 @@ limitations under the License.
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/thekubeworld/k8devel/pkg/client"
-	"github.com/thekubeworld/k8devel/pkg/emoji"
 	"github.com/thekubeworld/k8devel/pkg/configmap"
+	"github.com/thekubeworld/k8devel/pkg/emoji"
 	"github.com/thekubeworld/k8devel/pkg/logschema"
-        "github.com/sirupsen/logrus"
 )
 
 func main() {
-        logschema.SetLogrusLogging()
+	logschema.SetLogrusLogging()
 	e := emoji.LoadEmojis()
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
 	configMapList, err := configmap.ListAll(&c)
 	if err != nil {
 		logrus.Fatal(err)
-        }
+	}
 	for _, cm := range configMapList.Items {
 		logrus.Infof("Name %s", cm.ObjectMeta.Name)
 		logrus.Infof("Namespace: %s", cm.ObjectMeta.Namespace)
