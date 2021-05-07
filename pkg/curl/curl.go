@@ -20,11 +20,12 @@ import (
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 )
+
 // ExecuteHTTPReqInsideContainer will
 // execute http request to a specific address
 //
 // Args:
-//     
+//
 //      client struct
 //      container name
 //	namespace
@@ -34,19 +35,19 @@ import (
 //	output as string or error
 //
 func ExecuteHTTPReqInsideContainer(c *client.Client,
-                container string,
-                namespace string,
-		URL string) (string, error) {
+	container string,
+	namespace string,
+	URL string) (string, error) {
 
 	Cmd := []string{"curl"}
 	Cmd = append(Cmd, URL)
-        stdout, _, err := pod.ExecCmd(c,
-              container,
-              namespace,
-              Cmd)
-        if err != nil {
-                return "", err
-        }
+	stdout, _, err := pod.ExecCmd(c,
+		container,
+		namespace,
+		Cmd)
+	if err != nil {
+		return "", err
+	}
 
-        return string(stdout.Bytes()), nil
+	return string(stdout.Bytes()), nil
 }
