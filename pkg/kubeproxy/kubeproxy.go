@@ -17,11 +17,11 @@ limitations under the License.
 */
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
-	"context"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/firewall"
@@ -38,11 +38,11 @@ import (
 //
 // Returns:
 //	filename storing the firewall rules or error
-//     
+//
 func SaveCurrentFirewallState(c *client.Client,
-                configmapname string,
-                podname string,
-                namespace string) (string, error) {
+	configmapname string,
+	podname string,
+	namespace string) (string, error) {
 
 	mode, err := DetectKubeProxyMode(c,
 		configmapname,
@@ -65,7 +65,6 @@ func SaveCurrentFirewallState(c *client.Client,
 	return filesaved.Name(), nil
 }
 
-
 // FindKubeProxyPod will return one of the daemonsets
 // pods names for kubeproxy so we can connect to pod
 // and execute commands or other actions
@@ -78,17 +77,17 @@ func SaveCurrentFirewallState(c *client.Client,
 // Returns:
 //     the first kube-proxy pod found from the daemonsets
 //	or error
-//     
+//
 func FindKubeProxyPod(c *client.Client,
-			podname string,
-			namespace string) (string, error) {
+	podname string,
+	namespace string) (string, error) {
 	// Validation
 	kyPods, kyNumberPods := pod.FindPodsWithNameContains(c,
 		podname, namespace)
-        if kyNumberPods < 0 {
+	if kyNumberPods < 0 {
 		return "", errors.New(
 			"exiting... unable to find kube-proxy pod..")
-        }
+	}
 	return kyPods[0], nil
 }
 
@@ -102,11 +101,11 @@ func FindKubeProxyPod(c *client.Client,
 //
 // Returns:
 //     string (ipvs or iptables) OR error type
-//     
+//
 func DetectKubeProxyMode(c *client.Client,
-		configmapname string,
-		podname string,
-		namespace string) (string, error) {
+	configmapname string,
+	podname string,
+	namespace string) (string, error) {
 
 	// make sure we find at least one kube-proxy pod
 	_, err := FindKubeProxyPod(c, podname, namespace)
@@ -125,15 +124,15 @@ func DetectKubeProxyMode(c *client.Client,
 
 	// Detect if it's iptables
 	if strings.Contains(
-			fmt.Sprint(kproxyConfig.Data),
-			"mode: iptables") {
+		fmt.Sprint(kproxyConfig.Data),
+		"mode: iptables") {
 		return "iptables", nil
-        }
+	}
 
 	// Detect if it's ipvs
 	if strings.Contains(fmt.Sprint(kproxyConfig.Data), "mode: ipvs") {
-                return "ipvs", nil
-        }
+		return "ipvs", nil
+	}
 
 	return "", errors.New("unable to detect the kube-proxy mode")
 }
