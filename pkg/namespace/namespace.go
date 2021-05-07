@@ -20,10 +20,9 @@ import (
 	"context"
 
 	v1 "k8s.io/api/core/v1"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
-
 )
 
 // Delete will delete a namespace
@@ -34,16 +33,16 @@ import (
 //
 // Returns:
 //     error or nil
-//     
+//
 func Delete(c *client.Client, namespace string) error {
-        err := c.Clientset.CoreV1().Namespaces().Delete(
-                context.TODO(),
-                namespace,
-                metav1.DeleteOptions{})
-        if err != nil {
-                return err
-        }
-        return nil
+	err := c.Clientset.CoreV1().Namespaces().Delete(
+		context.TODO(),
+		namespace,
+		metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Create will create a namespace
@@ -54,25 +53,25 @@ func Delete(c *client.Client, namespace string) error {
 //
 // Returns:
 //     error or nil
-//     
+//
 func Create(c *client.Client, namespace string) error {
-        ns := &v1.Namespace {
-                ObjectMeta: metav1.ObjectMeta {
-                Name: namespace,
-                        Labels: map[string]string {
-                                "name": namespace,
-                        },
-                },
-        }
+	ns := &v1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespace,
+			Labels: map[string]string{
+				"name": namespace,
+			},
+		},
+	}
 
-        _, err := c.Clientset.CoreV1().Namespaces().Create(
-                context.TODO(),
-                ns,
-                metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
-        return nil
+	_, err := c.Clientset.CoreV1().Namespaces().Create(
+		context.TODO(),
+		ns,
+		metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Exists will check if the namespace exists or not
@@ -83,15 +82,15 @@ func Create(c *client.Client, namespace string) error {
 //
 // Returns:
 //     string (namespace name) OR error type
-//     
+//
 func Exists(c *client.Client, namespace string) (string, error) {
-        exists, err := c.Clientset.CoreV1().Namespaces().Get(
-                context.TODO(),
-                namespace,
-                metav1.GetOptions{})
-        if err != nil {
-                return "", err
-        }
+	exists, err := c.Clientset.CoreV1().Namespaces().Get(
+		context.TODO(),
+		namespace,
+		metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
 
-        return exists.Name, nil
+	return exists.Name, nil
 }
