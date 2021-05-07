@@ -18,14 +18,14 @@ limitations under the License.
 
 import (
 	"context"
-	"strconv"
 	"encoding/json"
+	"strconv"
 	"time"
 
+	"github.com/sirupsen/logrus"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	v1 "k8s.io/api/core/v1"
-	"github.com/sirupsen/logrus"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
@@ -33,14 +33,14 @@ import (
 
 // Instance type refers to the Endpoint object
 type Instance struct {
-	Name string
-	IP string
-	LabelKey string
-	LabelValue string
-	Namespace string
+	Name         string
+	IP           string
+	LabelKey     string
+	LabelValue   string
+	Namespace    string
 	EndpointPort struct {
-		Name string
-		Port int32
+		Name     string
+		Port     int32
 		Protocol string
 	}
 }
@@ -73,39 +73,39 @@ func List(c *client.Client, e *Instance) {
 func Patch(c *client.Client, e *Instance) error {
 	logrus.Infof("\n")
 	logrus.Infof("Patching endpoint: %s namespace: %s",
-			e.Name,
-			e.Namespace)
-        _, err := c.Clientset.CoreV1().Endpoints(e.Namespace).Get(
-                context.TODO(),
-                e.Name,
-                metav1.GetOptions{})
-        if err != nil {
-                return err
-        }
+		e.Name,
+		e.Namespace)
+	_, err := c.Clientset.CoreV1().Endpoints(e.Namespace).Get(
+		context.TODO(),
+		e.Name,
+		metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
 
 	endpointPatch, err := json.Marshal(map[string]interface{}{
-                        "metadata": map[string]interface{}{
-                                "labels": map[string]string{
-                                        e.LabelKey: e.LabelValue,
-                                },
-                        },
-                        "subsets": []map[string]interface{}{
-                                {
-                                        "addresses": []map[string]string{
-                                                {
-                                                        "ip": e.IP,
-                                                },
-                                        },
-                                        "ports": []map[string]interface{}{
-                                                {
-                                                        "name": e.EndpointPort.Name,
-                                                        "port": e.EndpointPort.Port,
-                                                        "protocol": e.EndpointPort.Protocol,
-                                                },
-                                        },
-                                },
-                        },
-                })
+		"metadata": map[string]interface{}{
+			"labels": map[string]string{
+				e.LabelKey: e.LabelValue,
+			},
+		},
+		"subsets": []map[string]interface{}{
+			{
+				"addresses": []map[string]string{
+					{
+						"ip": e.IP,
+					},
+				},
+				"ports": []map[string]interface{}{
+					{
+						"name":     e.EndpointPort.Name,
+						"port":     e.EndpointPort.Port,
+						"protocol": e.EndpointPort.Protocol,
+					},
+				},
+			},
+		},
+	})
 
 	// Executing the patch
 	_, err = c.Clientset.CoreV1().Endpoints(e.Namespace).Patch(
@@ -130,42 +130,42 @@ func Patch(c *client.Client, e *Instance) error {
 func Create(c *client.Client, e *Instance) error {
 	logrus.Infof("\n")
 	logrus.Infof("Creating endpoint: %s namespace: %s",
-			e.Name,
-			e.Namespace)
+		e.Name,
+		e.Namespace)
 
 	proto, err := util.DetectContainerPortProtocol(e.EndpointPort.Protocol)
-        if err != nil {
-                logrus.Fatal(err)
-        }
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
-        epoints := &v1.Endpoints{
-                ObjectMeta: metav1.ObjectMeta{
-                        Name: e.Name,
-                },
-                Subsets: []v1.EndpointSubset{
-                        {
-                                Addresses: []v1.EndpointAddress{
-                                        {
-                                                IP: e.IP,
-                                        },
-                                },
-                                Ports: []v1.EndpointPort{
-                                        {
-                                                Name:     e.EndpointPort.Name,
-                                                Port:     e.EndpointPort.Port,
-                                                Protocol: proto,
-                                        },
-                                },
-                        },
-                },
-        }
+	epoints := &v1.Endpoints{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: e.Name,
+		},
+		Subsets: []v1.EndpointSubset{
+			{
+				Addresses: []v1.EndpointAddress{
+					{
+						IP: e.IP,
+					},
+				},
+				Ports: []v1.EndpointPort{
+					{
+						Name:     e.EndpointPort.Name,
+						Port:     e.EndpointPort.Port,
+						Protocol: proto,
+					},
+				},
+			},
+		},
+	}
 	_, err = c.Clientset.CoreV1().Endpoints(e.Namespace).Create(
 		context.TODO(),
 		epoints,
 		metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
+	if err != nil {
+		return err
+	}
 	logrus.Infof("Created endpoint: %s", e.Name)
 	return nil
 }
@@ -175,40 +175,40 @@ func Create(c *client.Client, e *Instance) error {
 // 	- Client struct from client module
 //	- endpoint name
 func Show(c *client.Client, endpoint string, namespace string) error {
-        epoints, err := c.Clientset.CoreV1().Endpoints(namespace).Get(
-                context.TODO(),
-                endpoint,
-                metav1.GetOptions{})
-        if err != nil {
-                return err
-        }
+	epoints, err := c.Clientset.CoreV1().Endpoints(namespace).Get(
+		context.TODO(),
+		endpoint,
+		metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
 
 	logrus.Infof("\n")
 	logrus.Infof("Showing information about endpoint: %s namespace: %s",
-			endpoint,
-			namespace)
+		endpoint,
+		namespace)
 
-        if len(epoints.Subsets) == 0 {
-                logrus.Info("Subsets: []")
-        }
+	if len(epoints.Subsets) == 0 {
+		logrus.Info("Subsets: []")
+	}
 
-        port := ""
-        if len(epoints.Subsets[0].Ports) > 0 {
-                port = strconv.FormatInt(int64(epoints.Subsets[0].Ports[0].Port), 10)
-                for _, p := range epoints.Subsets[0].Ports {
-                        if p.Name != "" {
+	port := ""
+	if len(epoints.Subsets[0].Ports) > 0 {
+		port = strconv.FormatInt(int64(epoints.Subsets[0].Ports[0].Port), 10)
+		for _, p := range epoints.Subsets[0].Ports {
+			if p.Name != "" {
 				logrus.Infof("\tEndpointPort Name: %s", p.Name)
 				logrus.Infof("\tEndpointPort Port: %s", strconv.FormatInt(int64(p.Port), 10))
-                        }
-                }
+			}
+		}
 
 		for _, address := range epoints.Subsets[0].Addresses {
 			logrus.Infof("\tEndpointAddress: %s", address.IP)
 			logrus.Infof("\tEndpointAddress Port: %s", port)
 		}
-        }
+	}
 
-        return nil
+	return nil
 }
 
 // Delete will delete an endpoint
@@ -222,11 +222,11 @@ func Show(c *client.Client, endpoint string, namespace string) error {
 func Delete(c *client.Client, endpoint string, namespace string) error {
 	inst := Instance{Name: endpoint, Namespace: namespace}
 
-        _, err := c.Clientset.CoreV1().Endpoints(inst.Namespace).
-                Get(context.TODO(), inst.Name, metav1.GetOptions{})
-        if err != nil {
-                return err
-        }
+	_, err := c.Clientset.CoreV1().Endpoints(inst.Namespace).
+		Get(context.TODO(), inst.Name, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
 
 	logrus.Info("\n")
 	logrus.Infof("Deleting endpoint: %s namespace: %s...",
@@ -234,23 +234,23 @@ func Delete(c *client.Client, endpoint string, namespace string) error {
 		inst.Namespace)
 
 	// Double check endpoint is removed
-        for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
-                _, err := Exists(c, &inst)
+	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
+		_, err := Exists(c, &inst)
 		if err != nil {
-                        logrus.Infof("Deleted endpoint: %s namespace: %s",
-                                inst.Name,
-                                inst.Namespace)
-                        break
-                }
+			logrus.Infof("Deleted endpoint: %s namespace: %s",
+				inst.Name,
+				inst.Namespace)
+			break
+		}
 		c.Clientset.CoreV1().Endpoints(inst.Namespace).Delete(
 			context.TODO(),
 			inst.Name,
 			metav1.DeleteOptions{})
 
-                time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
-        }
+		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
+	}
 
-        return nil
+	return nil
 }
 
 // Exists will check if the endpoint exists or not
@@ -263,13 +263,13 @@ func Delete(c *client.Client, endpoint string, namespace string) error {
 //     bool OR error type
 //
 func Exists(c *client.Client, e *Instance) (string, error) {
-        exists, err := c.Clientset.CoreV1().Endpoints(e.Namespace).Get(
-                context.TODO(),
-                e.Name,
-                metav1.GetOptions{})
-        if err != nil {
-                return "", err
-        }
+	exists, err := c.Clientset.CoreV1().Endpoints(e.Namespace).Get(
+		context.TODO(),
+		e.Name,
+		metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
 
-        return exists.Name, nil
+	return exists.Name, nil
 }
