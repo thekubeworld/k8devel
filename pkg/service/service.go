@@ -325,7 +325,7 @@ func CreateExternalName(c *client.Client, s *Instance) error {
 		},
 		Spec: v1.ServiceSpec{
 			Type:         v1.ServiceTypeExternalName,
-			ExternalName: s.ExternalName,		},
+			ExternalName: s.ExternalName},
 	}
 
 	_, err := c.Clientset.CoreV1().Services(s.Namespace).Create(context.TODO(), service, metav1.CreateOptions{})
