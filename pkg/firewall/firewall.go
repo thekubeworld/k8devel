@@ -46,7 +46,7 @@ func Save(c *client.Client,
 	if firewallMode == "iptables" {
 		cmdSave = append(cmdSave, "iptables-save")
 	} else if firewallMode == "ipvs" {
-		cmdSave = append(cmdSave, "ipvs-save")
+		cmdSave = append(cmdSave, "ipvsadm-save")
 	} else {
 		return nil, errors.New("unknown firewall mode")
 	}
