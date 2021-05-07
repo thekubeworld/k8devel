@@ -17,30 +17,29 @@ limitations under the License.
 package main
 
 import (
-        "github.com/thekubeworld/k8devel/pkg/client"
-        "github.com/thekubeworld/k8devel/pkg/logschema"
-        "github.com/thekubeworld/k8devel/pkg/deployment"
-        "github.com/thekubeworld/k8devel/pkg/util"
-        "github.com/thekubeworld/k8devel/pkg/service"
-        "github.com/thekubeworld/k8devel/pkg/namespace"
-        "github.com/thekubeworld/k8devel/pkg/endpoint"
+	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/deployment"
+	"github.com/thekubeworld/k8devel/pkg/endpoint"
+	"github.com/thekubeworld/k8devel/pkg/logschema"
+	"github.com/thekubeworld/k8devel/pkg/namespace"
+	"github.com/thekubeworld/k8devel/pkg/service"
+	"github.com/thekubeworld/k8devel/pkg/util"
 
 	"github.com/sirupsen/logrus"
-
 )
 
 func main() {
 	logschema.SetLogrusLogging()
 	// Initial set
-        c := client.Client{}
+	c := client.Client{}
 	c.Namespace = "kptesting"
 	c.NumberMaxOfAttemptsPerTask = 5
-        c.TimeoutTaksInSec = 20
+	c.TimeoutTaksInSec = 20
 
 	// Connect to cluster from:
 	//	- $HOME/kubeconfig (Linux)
 	//	- os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	c.Connect()
 
 	KPTestNamespaceName := c.Namespace
 
@@ -49,17 +48,17 @@ func main() {
 		logrus.Fatal(err)
 	}
 	KPTestServiceName := KPTestNamespaceName +
-			"service" +
-			randStr
+		"service" +
+		randStr
 
 	KPTestNginxDeploymentName := KPTestNamespaceName +
-			"nginxdeployment" +
-			randStr
+		"nginxdeployment" +
+		randStr
 	// END: kube-proxy variables
 
 	// START: Namespace
 	_, err = namespace.Exists(&c,
-			KPTestNamespaceName)
+		KPTestNamespaceName)
 	if err != nil {
 		err = namespace.Create(&c,
 			KPTestNamespaceName)
@@ -70,11 +69,11 @@ func main() {
 	// END: Namespace
 
 	// START: Deployment
-	d := deployment.Instance {
-		Name: KPTestNginxDeploymentName,
-		Namespace: KPTestNamespaceName,
-		Replicas: 1,
-		LabelKey: "app",
+	d := deployment.Instance{
+		Name:       KPTestNginxDeploymentName,
+		Namespace:  KPTestNamespaceName,
+		Replicas:   1,
+		LabelKey:   "app",
 		LabelValue: "nginx",
 	}
 
@@ -91,15 +90,15 @@ func main() {
 	// END: Deployment
 
 	// START: Service
-	s := service.Instance {
-		Name: KPTestServiceName,
-		Namespace: KPTestNamespaceName,
-		LabelKey: "k8sapp",
-		LabelValue: "kproxy-testing",
-		SelectorKey: "k8sapp",
+	s := service.Instance{
+		Name:          KPTestServiceName,
+		Namespace:     KPTestNamespaceName,
+		LabelKey:      "k8sapp",
+		LabelValue:    "kproxy-testing",
+		SelectorKey:   "k8sapp",
 		SelectorValue: "kproxy-testing",
-		ClusterIP: "",
-		Port: 80,
+		ClusterIP:     "",
+		Port:          80,
 	}
 	err = service.CreateClusterIP(&c, &s)
 	if err != nil {
@@ -113,10 +112,10 @@ func main() {
 	// END: Service
 
 	// START: Endpoint
-	e := endpoint.Instance {
-		Name: "kproxy-service",
+	e := endpoint.Instance{
+		Name:      "kproxy-service",
 		Namespace: KPTestNamespaceName,
-		IP: "172.16.0.80",
+		IP:        "172.16.0.80",
 	}
 	e.EndpointPort.Name = "http"
 	e.EndpointPort.Port = 80

@@ -17,41 +17,41 @@ limitations under the License.
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/logschema"
 	"github.com/thekubeworld/k8devel/pkg/pod"
-        "github.com/sirupsen/logrus"
 )
 
 func main() {
-        logschema.SetLogrusLogging()
+	logschema.SetLogrusLogging()
 
-        containerName := "mytesting" // Put here the Pod name
-	namespace := "default" // Put here the namespace name
-	cmd := []string {"ls", "-la"} // Put here the command to be executed inside container
+	containerName := "mytesting" // Put here the Pod name
+	namespace := "default"       // Put here the namespace name
+	cmd := []string{"ls", "-la"} // Put here the command to be executed inside container
 
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
-        p := pod.Instance {
-                Name: containerName,
-                Namespace: namespace,
-                Image: "nginx",
-        }
+	p := pod.Instance{
+		Name:      containerName,
+		Namespace: namespace,
+		Image:     "nginx",
+	}
 	// POD Settings
 
-        pod.Create(&c, &p)
+	pod.Create(&c, &p)
 
 	stdout, _, err := pod.ExecCmd(&c, containerName, namespace, cmd)
 	if err != nil {
 		logrus.Fatal(err)
-        }
+	}
 
 	logrus.Infof("Output from command:")
 	logrus.Infof("%s", stdout.String())

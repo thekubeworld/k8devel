@@ -17,34 +17,34 @@ limitations under the License.
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/thekubeworld/k8devel/pkg/client"
-        "github.com/thekubeworld/k8devel/pkg/logschema"
-        "github.com/thekubeworld/k8devel/pkg/pod"
-        "github.com/sirupsen/logrus"
+	"github.com/thekubeworld/k8devel/pkg/logschema"
+	"github.com/thekubeworld/k8devel/pkg/pod"
 )
 
 func main() {
-        logschema.SetLogrusLogging()
+	logschema.SetLogrusLogging()
 
-        containerName := "mytesting" // Put here the Pod name
-	namespace := "default" // Put here the namespace name
+	containerName := "mytesting" // Put here the Pod name
+	namespace := "default"       // Put here the namespace name
 
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 20
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 20
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
-        p := pod.Instance {
-                Name: containerName,
-                Namespace: namespace,
-                Image: "nginx",
-		LabelKey: "app",
+	p := pod.Instance{
+		Name:       containerName,
+		Namespace:  namespace,
+		Image:      "nginx",
+		LabelKey:   "app",
 		LabelValue: "foobar",
-        }
+	}
 
 	err := pod.Create(&c, &p)
 	if err != nil {

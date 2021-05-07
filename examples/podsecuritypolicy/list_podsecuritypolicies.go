@@ -18,20 +18,20 @@ package main
 
 import (
 	"github.com/thekubeworld/k8devel/pkg/client"
-        "github.com/thekubeworld/k8devel/pkg/logschema"
-        "github.com/thekubeworld/k8devel/pkg/podsecuritypolicy"
+	"github.com/thekubeworld/k8devel/pkg/logschema"
+	"github.com/thekubeworld/k8devel/pkg/podsecuritypolicy"
 )
 
 func main() {
-        logschema.SetLogrusLogging()
+	logschema.SetLogrusLogging()
 
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 	podsecuritypolicy.ListAllPodSecurityPolicy(&c)
 }

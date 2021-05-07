@@ -18,30 +18,30 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
 
-	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/apply"
+	"github.com/thekubeworld/k8devel/pkg/client"
 )
 
 func main() {
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
 	yamlInput, err := ioutil.ReadFile("file.yaml")
-        if err != nil {
+	if err != nil {
 		os.Exit(1)
-        }
+	}
 
 	output := apply.YAML(&c, yamlInput)
-	for _, i := range(output) {
+	for _, i := range output {
 		fmt.Println(i)
 	}
 }

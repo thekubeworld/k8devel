@@ -28,18 +28,17 @@ import (
 func main() {
 	e := emoji.LoadEmojis()
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
-
-	s := serviceaccount.Instance {
-		Name: "myserviceaccount",
-		Namespace: "default",
+	s := serviceaccount.Instance{
+		Name:                         "myserviceaccount",
+		Namespace:                    "default",
 		AutomountServiceAccountToken: true,
 	}
 
@@ -47,12 +46,12 @@ func main() {
 	if err != nil {
 		fmt.Printf("%s %s\n", emoji.Show(e.CrossMark), err)
 		os.Exit(1)
-        }
+	}
 	fmt.Printf("%s create service account: %s\n%s namespace %s\n%s AutomountServiceAccountToken %v\n",
-			emoji.Show(e.Rocket),
-			s.Name,
-			emoji.Show(e.Rocket),
-			s.Namespace,
-			emoji.Show(e.Rocket),
-			s.AutomountServiceAccountToken)
+		emoji.Show(e.Rocket),
+		s.Name,
+		emoji.Show(e.Rocket),
+		s.Namespace,
+		emoji.Show(e.Rocket),
+		s.AutomountServiceAccountToken)
 }

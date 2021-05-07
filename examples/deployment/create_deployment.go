@@ -17,45 +17,45 @@ limitations under the License.
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/deployment"
 	"github.com/thekubeworld/k8devel/pkg/logschema"
-        "github.com/sirupsen/logrus"
 )
 
 func main() {
-        logschema.SetLogrusLogging()
+	logschema.SetLogrusLogging()
 
 	newDeployment := "newdeployment" // Put here the new deployment name
-	namespace := "default" // Put here the namespace name
+	namespace := "default"           // Put here the namespace name
 
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 
-	d := deployment.Instance {
-                Name: newDeployment,
-                Namespace: namespace,
-                Replicas: 1,
-                LabelKey: "app",
-                LabelValue: "nginxtesting",
-        }
+	d := deployment.Instance{
+		Name:       newDeployment,
+		Namespace:  namespace,
+		Replicas:   1,
+		LabelKey:   "app",
+		LabelValue: "nginxtesting",
+	}
 
-        d.Pod.Name = "nginx"
-        d.Pod.Image = "nginx:1.14.2"
-        d.Pod.ContainerPortName = "http"
-        d.Pod.ContainerPortProtocol = "TCP"
-        d.Pod.ContainerPort = 80
+	d.Pod.Name = "nginx"
+	d.Pod.Image = "nginx:1.14.2"
+	d.Pod.ContainerPortName = "http"
+	d.Pod.ContainerPortProtocol = "TCP"
+	d.Pod.ContainerPort = 80
 
 	err := deployment.Create(&c, &d)
-        if err != nil {
-                logrus.Fatal("exiting... failed to create: ", err)
-        }
+	if err != nil {
+		logrus.Fatal("exiting... failed to create: ", err)
+	}
 
 	logrus.Infof("Deployment %s namespace %s created!", newDeployment, namespace)
 }
