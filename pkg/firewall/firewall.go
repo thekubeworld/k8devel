@@ -16,11 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import (
+	"errors"
 	"fmt"
 	"os"
-	"errors"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/pod"
@@ -32,7 +31,7 @@ import (
 // Args:
 //	client struct
 //	firewallMode - iptables or ipvs
-//	container name	
+//	container name
 //	namespace
 //
 // Returns:
@@ -40,9 +39,9 @@ import (
 //	filesystem which triggered this method
 //
 func Save(c *client.Client,
-		firewallMode string,
-		container string,
-		namespace string)(*os.File, error) {
+	firewallMode string,
+	container string,
+	namespace string) (*os.File, error) {
 
 	var cmdSave []string
 	if firewallMode == "iptables" {
@@ -54,20 +53,20 @@ func Save(c *client.Client,
 	}
 
 	fileRef, err := util.CreateTempFile(os.TempDir(), "firewall")
-        if err != nil {
+	if err != nil {
 		return nil, err
-        }
+	}
 
 	stdout, _, err := pod.ExecCmd(c,
-              container,
-              namespace,
-              cmdSave)
-        if err != nil {
+		container,
+		namespace,
+		cmdSave)
+	if err != nil {
 		return nil, err
-        }
+	}
 
-        fileRef.Write(stdout.Bytes())
-        fileRef.Sync()
+	fileRef.Write(stdout.Bytes())
+	fileRef.Sync()
 
 	return fileRef, nil
 }
