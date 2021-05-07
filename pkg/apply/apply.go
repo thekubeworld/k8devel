@@ -58,7 +58,9 @@ func decode(data []byte) (runtime.Object, error) {
 //
 // TODO: Can we simplify the switch?
 // nolint: gocyclo
-func YAML(c *client.Client, yamlInput []byte) []string {
+func YAML( // nolint: gocyclo
+	c *client.Client,
+	yamlInput []byte) []string {
 	var output []string
 	yamlFiles := bytes.Split(yamlInput, []byte(yamlDelimiter))
 
