@@ -17,37 +17,37 @@ limitations under the License.
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/thekubeworld/k8devel/pkg/client"
-        "github.com/thekubeworld/k8devel/pkg/logschema"
-        "github.com/thekubeworld/k8devel/pkg/service"
-        "github.com/sirupsen/logrus"
+	"github.com/thekubeworld/k8devel/pkg/logschema"
+	"github.com/thekubeworld/k8devel/pkg/service"
 )
 
 func main() {
-        logschema.SetLogrusLogging()
+	logschema.SetLogrusLogging()
 
 	newService := "newservice" // Put here the new Service name
-	namespace := "default" // Put here the namespace name
+	namespace := "default"     // Put here the namespace name
 
 	c := client.Client{}
-        c.NumberMaxOfAttemptsPerTask = 10
-        c.TimeoutTaksInSec = 2
+	c.NumberMaxOfAttemptsPerTask = 10
+	c.TimeoutTaksInSec = 2
 
 	// Connect to cluster from:
-        //      - $HOME/kubeconfig (Linux)
-        //      - os.Getenv("USERPROFILE") (Windows)
-        c.Connect()
+	//      - $HOME/kubeconfig (Linux)
+	//      - os.Getenv("USERPROFILE") (Windows)
+	c.Connect()
 	c.Namespace = namespace
 
-	s := service.Instance {
-		Name: newService,
-		Namespace: namespace,
-		LabelKey: "app",
-		LabelValue: "k8s",
-		SelectorKey: "app",
+	s := service.Instance{
+		Name:          newService,
+		Namespace:     namespace,
+		LabelKey:      "app",
+		LabelValue:    "k8s",
+		SelectorKey:   "app",
 		SelectorValue: "k8s",
-		ClusterIP: "",
-		Port: 80,
+		ClusterIP:     "",
+		Port:          80,
 	}
 	err := service.CreateClusterIP(&c, &s)
 	if err != nil {
