@@ -20,21 +20,21 @@ import (
 	"os"
 	"path/filepath"
 
-	kubernetes "k8s.io/client-go/kubernetes"
-	clientcmd "k8s.io/client-go/tools/clientcmd"
 	"github.com/sirupsen/logrus"
+	kubernetes "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	clientcmd "k8s.io/client-go/tools/clientcmd"
 )
 
 // Client struct contains all info about client
 // to connect into the cluster
 type Client struct {
-        Clientset *kubernetes.Clientset
-	Restclientset *kubernetes.Clientset
-        Namespace string
-	Restconfig *rest.Config
-	Kubeconfig clientcmd.ClientConfig
-	TimeoutTaksInSec int
+	Clientset                  *kubernetes.Clientset
+	Restclientset              *kubernetes.Clientset
+	Namespace                  string
+	Restconfig                 *rest.Config
+	Kubeconfig                 clientcmd.ClientConfig
+	TimeoutTaksInSec           int
 	NumberMaxOfAttemptsPerTask int
 }
 
@@ -47,21 +47,21 @@ type Client struct {
 //   - Client struct
 func (client *Client) Connect() *Client {
 	// TODO: Users can specify by dynamic the HOME for kubeconfig
-        home, exists := os.LookupEnv("HOME")
-        if !exists {
-                home = os.Getenv("USERPROFILE") // windows
-        }
+	home, exists := os.LookupEnv("HOME")
+	if !exists {
+		home = os.Getenv("USERPROFILE") // windows
+	}
 
-        configPath := filepath.Join(home, ".kube", "config")
-        config, err := clientcmd.BuildConfigFromFlags("", configPath)
-        if err != nil {
-                logrus.Fatal("exiting... failed to create: ", err)
-        }
+	configPath := filepath.Join(home, ".kube", "config")
+	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		logrus.Fatal("exiting... failed to create: ", err)
+	}
 
-        client.Clientset, err = kubernetes.NewForConfig(config)
-        if err != nil {
-                logrus.Fatal("exiting... failed to create:  ", err)
-        }
+	client.Clientset, err = kubernetes.NewForConfig(config)
+	if err != nil {
+		logrus.Fatal("exiting... failed to create:  ", err)
+	}
 
 	client.KubeClientFromConfig()
 	return client
