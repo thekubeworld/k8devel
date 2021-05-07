@@ -25,23 +25,23 @@ import (
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/remotecommand"
-	"k8s.io/apimachinery/pkg/util/wait"
 
 	v1 "k8s.io/api/core/v1"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Instance type refers to the Pod object
 type Instance struct {
-	Name string
-	Namespace string
-	Image string
-	Command []string
+	Name        string
+	Namespace   string
+	Image       string
+	Command     []string
 	CommandArgs []string
-	LabelKey string
-	LabelValue string
+	LabelKey    string
+	LabelValue  string
 }
 
 // ExecCmd executes a command inside a POD
@@ -54,9 +54,9 @@ type Instance struct {
 // Returns:
 //	stdout, stderr as bytes.Buffer or error
 func ExecCmd(c *client.Client,
-		podName string,
-		nameSpace string,
-		cmd []string) (bytes.Buffer, bytes.Buffer, error) {
+	podName string,
+	nameSpace string,
+	cmd []string) (bytes.Buffer, bytes.Buffer, error) {
 
 	restClient := c.Clientset.CoreV1().RESTClient()
 
@@ -104,13 +104,13 @@ func ExecCmd(c *client.Client,
 // Returns:
 //	- the IP as string or error
 func GetIP(c *client.Client,
-		podName string,
-		nameSpace string) (string, error) {
+	podName string,
+	nameSpace string) (string, error) {
 
 	pod, err := c.Clientset.CoreV1().Pods(nameSpace).Get(
-                context.TODO(),
+		context.TODO(),
 		podName,
-                metav1.GetOptions{})
+		metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -129,21 +129,21 @@ func GetIP(c *client.Client,
 // Return:
 //      - error or nil
 func FindPodsWithNameContains(c *client.Client,
-                substring string,
-                namespace string) ([]string, int){
+	substring string,
+	namespace string) ([]string, int) {
 
 	var podsFound []string
-        listPods, _ := c.Clientset.CoreV1().Pods(namespace).List(
-                context.TODO(),
-                metav1.ListOptions{})
+	listPods, _ := c.Clientset.CoreV1().Pods(namespace).List(
+		context.TODO(),
+		metav1.ListOptions{})
 
-        for _, p := range listPods.Items {
-                if strings.Contains(p.Name, substring) {
-                        podsFound = append(podsFound, p.Name)
-                }
-        }
+	for _, p := range listPods.Items {
+		if strings.Contains(p.Name, substring) {
+			podsFound = append(podsFound, p.Name)
+		}
+	}
 
-        return podsFound, len(podsFound)
+	return podsFound, len(podsFound)
 }
 
 // isPodRunning will check if the pod is running
@@ -202,9 +202,9 @@ func waitForPodRunning(c *client.Client, namespace, podname string, timeout time
 //	nil or error
 func WaitForPodInRunningState(c *client.Client, podname string, namespace string) error {
 	if err := waitForPodRunning(c,
-			namespace,
-			podname,
-			time.Duration(c.TimeoutTaksInSec)*time.Second); err != nil {
+		namespace,
+		podname,
+		time.Duration(c.TimeoutTaksInSec)*time.Second); err != nil {
 		return err
 	}
 	return nil
@@ -219,13 +219,13 @@ func WaitForPodInRunningState(c *client.Client, podname string, namespace string
 //     string (namespace name) OR error type
 //
 func Exists(c *client.Client, podName string, namespace string) (string, error) {
-        exists, err := c.Clientset.CoreV1().Services(namespace).
-                Get(context.TODO(), podName, metav1.GetOptions{})
-        if err != nil {
-                return "", err
-        }
+	exists, err := c.Clientset.CoreV1().Services(namespace).
+		Get(context.TODO(), podName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
 
-        return exists.Name, nil
+	return exists.Name, nil
 }
 
 // CreatePod will create a POD
@@ -238,20 +238,20 @@ func Exists(c *client.Client, podName string, namespace string) (string, error) 
 //      - error or nil
 func Create(c *client.Client, p *Instance) error {
 	pod := &v1.Pod{
-		ObjectMeta: metav1.ObjectMeta {
-			Name: p.Name,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      p.Name,
 			Namespace: p.Namespace,
-			Labels: map[string]string {
+			Labels: map[string]string{
 				p.LabelKey: p.LabelValue,
 			},
 		},
-		Spec: v1.PodSpec {
+		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
-					Name: p.Name,
-					Image: p.Image,
+					Name:    p.Name,
+					Image:   p.Image,
 					Command: p.Command,
-					Args: p.CommandArgs,
+					Args:    p.CommandArgs,
 				},
 			},
 		},
@@ -261,9 +261,9 @@ func Create(c *client.Client, p *Instance) error {
 		context.TODO(),
 		pod,
 		metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
+	if err != nil {
+		return err
+	}
 
 	err = WaitForPodInRunningState(c, p.Name, p.Namespace)
 	if err != nil {
