@@ -16,7 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import (
 	"github.com/sirupsen/logrus"
 )
@@ -31,9 +30,9 @@ import (
 //
 func SetLogrusLogging() {
 	customFormatter := new(logrus.TextFormatter)
-        customFormatter.TimestampFormat = "2006-01-02 15:04:05"
-        logrus.SetFormatter(customFormatter)
-        customFormatter.FullTimestamp = true
+	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
+	logrus.SetFormatter(customFormatter)
+	customFormatter.FullTimestamp = true
 	logrus.Infof("Finished logrus log format settings...")
-        logrus.Infof("\n")
+	logrus.Infof("\n")
 }
