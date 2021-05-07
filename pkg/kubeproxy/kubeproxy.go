@@ -140,13 +140,13 @@ func DetectKubeProxyMode(c *client.Client,
 
 		// apt update
 		apt.UpdateInsidePod(
-			&c,
+			c,
 			podname,
 			namespace)
 
 		// apt install ipvsadm
 		apt.InstallPackageInsidePod(
-			&c,
+			c,
 			podname,
 			namespace,
 			"ipvsadm")
