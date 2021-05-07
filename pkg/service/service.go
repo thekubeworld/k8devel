@@ -276,7 +276,7 @@ func CreateNodePort(c *client.Client, s *Instance) error {
 func CreateLoadBalancer(c *client.Client, s *Instance) error {
 	serviceProtocol, err := util.DetectContainerPortProtocol(s.PortProtocol)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	service := &v1.Service{
