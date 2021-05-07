@@ -18,12 +18,12 @@ limitations under the License.
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
-	"errors"
 
 	v1beta1 "k8s.io/api/policy/v1beta1"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
@@ -75,12 +75,12 @@ func ListAllPodSecurityPolicy(c *client.Client) error {
 		fmt.Println("\tAllow Host IPC:", psp.Items[i].Spec.HostIPC)
 		fmt.Println("\tRead Only Root Filesystem:", psp.Items[i].Spec.ReadOnlyRootFilesystem)
 		fmt.Println("\tSELinux Context Strategy:", psp.Items[i].Spec.SELinux.Rule)
-                if psp.Items[i].Spec.SELinux.SELinuxOptions != nil {
+		if psp.Items[i].Spec.SELinux.SELinuxOptions != nil {
 			fmt.Println("\t\tUser:", psp.Items[i].Spec.SELinux.SELinuxOptions.User)
 			fmt.Println("\t\tRole:", psp.Items[i].Spec.SELinux.SELinuxOptions.Role)
 			fmt.Println("\t\tSELinux Type:", psp.Items[i].Spec.SELinux.SELinuxOptions.Type)
 			fmt.Println("\t\tLevel:", psp.Items[i].Spec.SELinux.SELinuxOptions.Level)
-                }
+		}
 		fmt.Println("\tRun As User Strategy:", psp.Items[i].Spec.RunAsUser.Rule)
 		fmt.Println("\tRanges: ", psp.Items[i].Spec.RunAsUser.Ranges)
 
@@ -89,7 +89,7 @@ func ListAllPodSecurityPolicy(c *client.Client) error {
 
 		fmt.Println("\tSupplemental Groups Strategy:", psp.Items[i].Spec.SupplementalGroups.Rule)
 		fmt.Println("\tRanges:", idRangeToString(psp.Items[i].Spec.SupplementalGroups.Ranges))
-        }
+	}
 	return nil
 }
 
@@ -100,13 +100,13 @@ func ListAllPodSecurityPolicy(c *client.Client) error {
 // Returns
 //	string
 func idRangeToString(ranges []v1beta1.IDRange) string {
-        formattedString := ""
-        if ranges != nil {
-                strRanges := []string{}
-                for _, r := range ranges {
-                        strRanges = append(strRanges, fmt.Sprintf("%d-%d", r.Min, r.Max))
-                }
-                formattedString = strings.Join(strRanges, ",")
-        }
-        return formattedString
+	formattedString := ""
+	if ranges != nil {
+		strRanges := []string{}
+		for _, r := range ranges {
+			strRanges = append(strRanges, fmt.Sprintf("%d-%d", r.Min, r.Max))
+		}
+		formattedString = strings.Join(strRanges, ",")
+	}
+	return formattedString
 }
