@@ -27,8 +27,8 @@ import (
 
 // Instance holds values for serviceaccount
 type Instance struct {
-	Name string
-	Namespace string
+	Name                         string
+	Namespace                    string
 	AutomountServiceAccountToken bool
 }
 
@@ -40,7 +40,7 @@ type Instance struct {
 //
 // Returns:
 //     error or nil
-//     
+//
 func Create(c *client.Client, i *Instance) error {
 
 	// by defaut we set AutomountServiceAccountToken as true
@@ -52,14 +52,14 @@ func Create(c *client.Client, i *Instance) error {
 	SA := &v1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: i.Namespace,
-			Name: i.Name,
-                },
-                AutomountServiceAccountToken: &autoservice,
-        }
-        _, err := c.Clientset.CoreV1().ServiceAccounts(i.Namespace).Create(
-			context.TODO(),
-			SA,
-			metav1.CreateOptions{})
+			Name:      i.Name,
+		},
+		AutomountServiceAccountToken: &autoservice,
+	}
+	_, err := c.Clientset.CoreV1().ServiceAccounts(i.Namespace).Create(
+		context.TODO(),
+		SA,
+		metav1.CreateOptions{})
 
 	return err
 }
