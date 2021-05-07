@@ -18,22 +18,21 @@ limitations under the License.
 
 import (
 	"context"
-	"time"
-	v1 "k8s.io/api/core/v1"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/sirupsen/logrus"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
 
 // Instance type refers to the ConfigMap object
 type Instance struct {
-        Name string
-        Namespace string
-        ConfigKey string
-        ConfigValue string
+	Name        string
+	Namespace   string
+	ConfigKey   string
+	ConfigValue string
 }
-
 
 // Show will list all ConfigMaps
 //
@@ -111,7 +110,6 @@ func Delete(c *client.Client, configmap string, namespace string) error {
 	return nil
 }
 
-
 // Exists will check if the configmap exists or not
 //
 // Args:
@@ -119,19 +117,19 @@ func Delete(c *client.Client, configmap string, namespace string) error {
 //
 // Returns:
 //     string (namespace name) OR error type
-//     
+//
 func Exists(c *client.Client, configmap string, namespace string) (string, error) {
 	exists, err := c.Clientset.CoreV1().ConfigMaps(namespace).
 		Get(context.TODO(), configmap, metav1.GetOptions{})
 	if err != nil {
-                return "", err
-        }
+		return "", err
+	}
 
-        return exists.Name, nil
+	return exists.Name, nil
 }
 
 // Create creates a configmap using the values
-// from the ConfigMap struct via the Client.Clientset 
+// from the ConfigMap struct via the Client.Clientset
 //
 // Args:
 //    ConfigMap - ConfigMap struct
@@ -140,32 +138,32 @@ func Exists(c *client.Client, configmap string, namespace string) (string, error
 //   Returns:
 //      error or nil
 func Create(c *client.Client, cm *Instance) error {
-        configmap := &v1.ConfigMap {
-                ObjectMeta: metav1.ObjectMeta {
-                        Name: cm.Name,
-                        Namespace: cm.Namespace,
-                },
-		Data: map[string]string {
+	configmap := &v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cm.Name,
+			Namespace: cm.Namespace,
+		},
+		Data: map[string]string{
 			cm.ConfigKey: cm.ConfigValue,
-                },
-        }
+		},
+	}
 
 	logrus.Infof("\n")
 	logrus.Infof("Creating configmap: %s namespace: %s",
 		cm.Name,
 		c.Namespace)
 
-        _, err := c.Clientset.CoreV1().ConfigMaps(cm.Namespace).Create(
-                context.TODO(),
+	_, err := c.Clientset.CoreV1().ConfigMaps(cm.Namespace).Create(
+		context.TODO(),
 		configmap,
-                metav1.CreateOptions{})
-        if err != nil {
-                return err
-        }
+		metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
 
 	logrus.Infof("Created configmap: %s namespace: %s",
 		cm.Name,
 		cm.Namespace)
 
-        return nil
+	return nil
 }
