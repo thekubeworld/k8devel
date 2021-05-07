@@ -24,6 +24,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/thekubeworld/k8devel/pkg/apt"
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/firewall"
 	"github.com/thekubeworld/k8devel/pkg/pod"
@@ -134,7 +135,22 @@ func DetectKubeProxyMode(c *client.Client,
 	}
 
 	// Detect if it's ipvs
-	if strings.Contains(fmt.Sprint(kproxyConfig.Data), "mode: ipvs") {
+	if strings.Contains(
+		fmt.Sprint(kproxyConfig.Data), "mode: ipvs") {
+
+		// apt update
+		apt.UpdateInsidePod(
+			&c,
+			podname,
+			namespace)
+
+		// apt install ipvsadm
+		apt.InstallPackageInsidePod(
+			&c,
+			podname,
+			namespace,
+			"ipvsadm")
+
 		return "ipvs", nil
 	}
 
