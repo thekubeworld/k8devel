@@ -62,6 +62,9 @@ func SaveCurrentFirewallState(c *client.Client,
 		mode,
 		podname,
 		namespace)
+	if err != nil {
+		return "", err
+	}
 
 	return filesaved.Name(), nil
 }

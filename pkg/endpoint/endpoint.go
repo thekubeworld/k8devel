@@ -106,6 +106,9 @@ func Patch(c *client.Client, e *Instance) error {
 			},
 		},
 	})
+	if err != nil {
+		return err
+	}
 
 	// Executing the patch
 	_, err = c.Clientset.CoreV1().Endpoints(e.Namespace).Patch(
@@ -114,6 +117,9 @@ func Patch(c *client.Client, e *Instance) error {
 		types.StrategicMergePatchType,
 		[]byte(endpointPatch),
 		metav1.PatchOptions{})
+	if err != nil {
+		return err
+	}
 
 	logrus.Infof("Patched endpoint: %s namespace %s", e.Name, e.Namespace)
 	return nil

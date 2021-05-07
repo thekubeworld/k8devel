@@ -220,6 +220,10 @@ func CreateClusterIP(c *client.Client, s *Instance) error {
 //      error or nil
 func CreateNodePort(c *client.Client, s *Instance) error {
 	serviceProtocol, err := util.DetectContainerPortProtocol(s.PortProtocol)
+	if err != nil {
+		return err
+	}
+
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      s.Name,
@@ -271,6 +275,10 @@ func CreateNodePort(c *client.Client, s *Instance) error {
 //      error or nil
 func CreateLoadBalancer(c *client.Client, s *Instance) error {
 	serviceProtocol, err := util.DetectContainerPortProtocol(s.PortProtocol)
+	if err != nil {
+		return "", err
+	}
+
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      s.Name,

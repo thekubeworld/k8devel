@@ -133,6 +133,9 @@ func CreateTempFile(dirname string, filename string) (*os.File, error) {
 //      path as string or error
 func DownloadFile(url string) (string, error) {
 	out, err := CreateTempFile(os.TempDir(), "downloadedfile")
+	if err != nil {
+		return "", err
+	}
 	defer out.Close()
 
 	// Get the data
