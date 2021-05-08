@@ -19,6 +19,7 @@ limitations under the License.
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -28,7 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -85,13 +85,13 @@ func CompareFiles(fileone string, filetwo string) (bool, error) {
 //   Returns:
 //      bytes from the file or error
 func DiffCommand(fileone string, filetwo string) ([]byte, error) {
-	logrus.Infof("Diffing %s and %s", fileone, filetwo)
+	fmt.Printf("Diffing %s and %s\n", fileone, filetwo)
 	path, err := exec.LookPath("diff")
 	if err != nil {
 		return nil, err
 	}
 	var out bytes.Buffer
-	logrus.Infof("%s -r -u -N %s %s", path, fileone, filetwo)
+	fmt.Printf("%s -r -u -N %s %s\n", path, fileone, filetwo)
 	cmd := exec.Command(path,
 		"-r",
 		"-u",
