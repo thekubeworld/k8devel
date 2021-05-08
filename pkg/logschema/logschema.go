@@ -33,6 +33,4 @@ func SetLogrusLogging() {
 	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
 	logrus.SetFormatter(customFormatter)
 	customFormatter.FullTimestamp = true
-	logrus.Infof("Finished logrus log format settings...")
-	logrus.Infof("\n")
 }

@@ -18,10 +18,11 @@ limitations under the License.
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"time"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"time"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
@@ -85,8 +86,8 @@ func Delete(c *client.Client, configmap string, namespace string) error {
 		return err
 	}
 
-	logrus.Info("\n")
-	logrus.Infof("Deleting configmap: %s namespace: %s...",
+	fmt.Printf("\n")
+	fmt.Printf("Deleting configmap: %s namespace: %s...\n",
 		configmap,
 		namespace)
 
@@ -94,7 +95,7 @@ func Delete(c *client.Client, configmap string, namespace string) error {
 	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
 		_, err := Exists(c, configmap, namespace)
 		if err != nil {
-			logrus.Infof("Deleted configmap: %s namespace: %s",
+			fmt.Printf("Deleted configmap: %s namespace: %s\n",
 				configmap,
 				namespace)
 			break
@@ -148,8 +149,8 @@ func Create(c *client.Client, cm *Instance) error {
 		},
 	}
 
-	logrus.Infof("\n")
-	logrus.Infof("Creating configmap: %s namespace: %s",
+	fmt.Printf("\n")
+	fmt.Printf("Creating configmap: %s namespace: %s\n",
 		cm.Name,
 		c.Namespace)
 
@@ -161,7 +162,7 @@ func Create(c *client.Client, cm *Instance) error {
 		return err
 	}
 
-	logrus.Infof("Created configmap: %s namespace: %s",
+	fmt.Printf("Created configmap: %s namespace: %s\n",
 		cm.Name,
 		cm.Namespace)
 
