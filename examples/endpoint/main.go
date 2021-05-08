@@ -17,19 +17,18 @@ limitations under the License.
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/deployment"
 	"github.com/thekubeworld/k8devel/pkg/endpoint"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 	"github.com/thekubeworld/k8devel/pkg/namespace"
 	"github.com/thekubeworld/k8devel/pkg/service"
 	"github.com/thekubeworld/k8devel/pkg/util"
-
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
 	// Initial set
 	c := client.Client{}
 	c.Namespace = "kptesting"
@@ -45,7 +44,8 @@ func main() {
 
 	randStr, err := util.GenerateRandomString(6, "lower")
 	if err != nil {
-		logrus.Fatal(err)
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
 	}
 	KPTestServiceName := KPTestNamespaceName +
 		"service" +
@@ -63,7 +63,8 @@ func main() {
 		err = namespace.Create(&c,
 			KPTestNamespaceName)
 		if err != nil {
-			logrus.Fatal("exiting... failed to create: ", err)
+			fmt.Printf("exiting... failed to create: %s\n", err)
+			os.Exit(1)
 		}
 	}
 	// END: Namespace
@@ -85,7 +86,8 @@ func main() {
 
 	err = deployment.Create(&c, &d)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
 	// END: Deployment
 
@@ -102,13 +104,15 @@ func main() {
 	}
 	err = service.CreateClusterIP(&c, &s)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
 	IPService, err := service.GetIP(&c, KPTestServiceName, KPTestNamespaceName)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
-	logrus.Info(IPService)
+	fmt.Printf("%s\n", IPService)
 	// END: Service
 
 	// START: Endpoint
@@ -125,12 +129,14 @@ func main() {
 	if epoint != "" {
 		err = endpoint.Patch(&c, &e)
 		if err != nil {
-			logrus.Fatal("exiting... failed to update: ", err)
+			fmt.Printf("exiting... failed to update: %s\n", err)
+			os.Exit(1)
 		}
 	} else {
 		err = endpoint.Create(&c, &e)
 		if err != nil {
-			logrus.Fatal("exiting... failed to create: ", err)
+			fmt.Printf("exiting... failed to create: %s\n", err)
+			os.Exit(1)
 		}
 	}
 	endpoint.Show(&c, "kproxy-service", c.Namespace)
