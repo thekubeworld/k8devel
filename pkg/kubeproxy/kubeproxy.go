@@ -24,7 +24,6 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/thekubeworld/k8devel/pkg/apt"
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/firewall"
 	"github.com/thekubeworld/k8devel/pkg/pod"
@@ -60,28 +59,29 @@ func SaveCurrentFirewallState(c *client.Client,
 	}
 
 	// TODO: only try to install if the package is not installed
-	if mode == "ipvs" {
-		// apt update
-		fmt.Println("updating the systme...")
-		_, err := apt.UpdateInsidePod(
-			c,
-			podname,
-			namespace)
-		if err != nil {
-			return "", err
-		}
+	/*
+		if mode == "ipvs" {
+			// apt update
+			fmt.Println("updating the systme...")
+			_, err := apt.UpdateInsidePod(
+				c,
+				podname,
+				namespace)
+			if err != nil {
+				return "", err
+			}
 
-		// apt install ipvsadm
-		out, err := apt.InstallPackageInsidePod(
-			c,
-			podname,
-			namespace,
-			"ipvsadm")
-		if err != nil {
-			return "", err
+			// apt install ipvsadm
+			out, err := apt.InstallPackageInsidePod(
+				c,
+				podname,
+				namespace,
+				"ipvsadm")
+			if err != nil {
+				return "", err
+			}
 		}
-	}
-
+	*/
 	filesaved, err := firewall.Save(c,
 		mode,
 		podname,
