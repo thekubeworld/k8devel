@@ -19,10 +19,10 @@ limitations under the License.
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -55,10 +55,10 @@ type Instance struct {
 //	- error or nil
 func List(c *client.Client, e *Instance) {
 	epoints, _ := c.Clientset.CoreV1().Endpoints(e.Namespace).List(context.TODO(), metav1.ListOptions{})
-	logrus.Info("\n")
-	logrus.Infof("Listing endpoints in namespace %s: ", e.Namespace)
+	fmt.Printf("\n")
+	fmt.Printf("Listing endpoints in namespace %s:\n", e.Namespace)
 	for _, ep := range epoints.Items {
-		logrus.Info("\tName: " + ep.Name)
+		fmt.Printf("\tName: " + ep.Name)
 	}
 }
 
@@ -71,8 +71,8 @@ func List(c *client.Client, e *Instance) {
 // Return:
 //	- error or nil
 func Patch(c *client.Client, e *Instance) error {
-	logrus.Infof("\n")
-	logrus.Infof("Patching endpoint: %s namespace: %s",
+	fmt.Printf("\n")
+	fmt.Printf("Patching endpoint: %s namespace: %s\n",
 		e.Name,
 		e.Namespace)
 	_, err := c.Clientset.CoreV1().Endpoints(e.Namespace).Get(
@@ -121,7 +121,7 @@ func Patch(c *client.Client, e *Instance) error {
 		return err
 	}
 
-	logrus.Infof("Patched endpoint: %s namespace %s", e.Name, e.Namespace)
+	fmt.Printf("Patched endpoint: %s namespace %s\n", e.Name, e.Namespace)
 	return nil
 }
 
@@ -134,14 +134,15 @@ func Patch(c *client.Client, e *Instance) error {
 // Return:
 //	- error or nil
 func Create(c *client.Client, e *Instance) error {
-	logrus.Infof("\n")
-	logrus.Infof("Creating endpoint: %s namespace: %s",
+	fmt.Printf("\n")
+	fmt.Printf("Creating endpoint: %s namespace: %s\n",
 		e.Name,
 		e.Namespace)
 
 	proto, err := util.DetectContainerPortProtocol(e.EndpointPort.Protocol)
 	if err != nil {
-		logrus.Fatal(err)
+		fmt.Printf("%s\n", err)
+		return err
 	}
 
 	epoints := &v1.Endpoints{
@@ -172,7 +173,7 @@ func Create(c *client.Client, e *Instance) error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("Created endpoint: %s", e.Name)
+	fmt.Printf("Created endpoint: %s\n", e.Name)
 	return nil
 }
 
@@ -189,13 +190,13 @@ func Show(c *client.Client, endpoint string, namespace string) error {
 		return err
 	}
 
-	logrus.Infof("\n")
-	logrus.Infof("Showing information about endpoint: %s namespace: %s",
+	fmt.Printf("\n")
+	fmt.Printf("Showing information about endpoint: %s namespace: %s\n",
 		endpoint,
 		namespace)
 
 	if len(epoints.Subsets) == 0 {
-		logrus.Info("Subsets: []")
+		fmt.Printf("Subsets: []")
 	}
 
 	port := ""
@@ -203,14 +204,14 @@ func Show(c *client.Client, endpoint string, namespace string) error {
 		port = strconv.FormatInt(int64(epoints.Subsets[0].Ports[0].Port), 10)
 		for _, p := range epoints.Subsets[0].Ports {
 			if p.Name != "" {
-				logrus.Infof("\tEndpointPort Name: %s", p.Name)
-				logrus.Infof("\tEndpointPort Port: %s", strconv.FormatInt(int64(p.Port), 10))
+				fmt.Printf("\tEndpointPort Name: %s\n", p.Name)
+				fmt.Printf("\tEndpointPort Port: %s\n", strconv.FormatInt(int64(p.Port), 10))
 			}
 		}
 
 		for _, address := range epoints.Subsets[0].Addresses {
-			logrus.Infof("\tEndpointAddress: %s", address.IP)
-			logrus.Infof("\tEndpointAddress Port: %s", port)
+			fmt.Printf("\tEndpointAddress: %s\n", address.IP)
+			fmt.Printf("\tEndpointAddress Port: %s\n", port)
 		}
 	}
 
@@ -234,8 +235,8 @@ func Delete(c *client.Client, endpoint string, namespace string) error {
 		return err
 	}
 
-	logrus.Info("\n")
-	logrus.Infof("Deleting endpoint: %s namespace: %s...",
+	fmt.Printf("\n")
+	fmt.Printf("Deleting endpoint: %s namespace: %s...\n",
 		inst.Name,
 		inst.Namespace)
 
@@ -243,7 +244,7 @@ func Delete(c *client.Client, endpoint string, namespace string) error {
 	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
 		_, err := Exists(c, &inst)
 		if err != nil {
-			logrus.Infof("Deleted endpoint: %s namespace: %s",
+			fmt.Printf("Deleted endpoint: %s namespace: %s\n",
 				inst.Name,
 				inst.Namespace)
 			break
