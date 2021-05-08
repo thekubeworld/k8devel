@@ -65,7 +65,7 @@ func SaveCurrentFirewallState(c *client.Client,
 		_, err := dpkg.CheckPackageInstalled(c, podman, namespace, "ipvsadm")
 		if err != nil {
 			// apt update
-			_, err := apt.UpdateInsidePod(
+			_, err = apt.UpdateInsidePod(
 				c,
 				podname,
 				namespace)
