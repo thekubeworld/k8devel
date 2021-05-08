@@ -20,7 +20,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	kubernetes "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	clientcmd "k8s.io/client-go/tools/clientcmd"
@@ -55,12 +54,12 @@ func (client *Client) Connect() *Client {
 	configPath := filepath.Join(home, ".kube", "config")
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		return err
 	}
 
 	client.Clientset, err = kubernetes.NewForConfig(config)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create:  ", err)
+		return err
 	}
 
 	client.KubeClientFromConfig()
