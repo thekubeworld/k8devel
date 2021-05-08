@@ -59,6 +59,29 @@ func SaveCurrentFirewallState(c *client.Client,
 		return "", err
 	}
 
+	// TODO: only try to install if the package is not installed
+	if mode == "ipvs" {
+		// apt update
+		fmt.Println("updating the systme...")
+		_, err := apt.UpdateInsidePod(
+			c,
+			podname,
+			namespace)
+		if err != nil {
+			return "", err
+		}
+
+		// apt install ipvsadm
+		out, err := apt.InstallPackageInsidePod(
+			c,
+			podname,
+			namespace,
+			"ipvsadm")
+		if err != nil {
+			return "", err
+		}
+	}
+
 	filesaved, err := firewall.Save(c,
 		mode,
 		podname,
@@ -137,19 +160,6 @@ func DetectKubeProxyMode(c *client.Client,
 	// Detect if it's ipvs
 	if strings.Contains(
 		fmt.Sprint(kproxyConfig.Data), "mode: ipvs") {
-
-		// apt update
-		apt.UpdateInsidePod(
-			c,
-			podname,
-			namespace)
-
-		// apt install ipvsadm
-		apt.InstallPackageInsidePod(
-			c,
-			podname,
-			namespace,
-			"ipvsadm")
 
 		return "ipvs", nil
 	}
