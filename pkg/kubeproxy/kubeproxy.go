@@ -72,7 +72,7 @@ func SaveCurrentFirewallState(c *client.Client,
 		}
 
 		// apt install ipvsadm
-		_, err := apt.InstallPackageInsidePod(
+		_, err = apt.InstallPackageInsidePod(
 			c,
 			podname,
 			namespace,
