@@ -18,13 +18,10 @@ package main
 
 import (
 	"github.com/thekubeworld/k8devel/pkg/client"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 	"github.com/thekubeworld/k8devel/pkg/podsecuritypolicy"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
-
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
 	c.TimeoutTaksInSec = 2
