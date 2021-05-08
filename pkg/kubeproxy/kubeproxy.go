@@ -26,6 +26,7 @@ import (
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/debian/apt"
+	"github.com/thekubeworld/k8devel/pkg/debian/dpkg"
 	"github.com/thekubeworld/k8devel/pkg/firewall"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 )
@@ -59,26 +60,28 @@ func SaveCurrentFirewallState(c *client.Client,
 		return "", err
 	}
 
-	// TODO: only try to install if the package is not installed
 	if mode == "ipvs" {
-		// apt update
-		fmt.Println("updating the systme...")
-		_, err := apt.UpdateInsidePod(
-			c,
-			podname,
-			namespace)
+		// check if ipvsadm exists, if not install it
+		_, err := dpkg.CheckPackageInstalled(c, podman, namespace, "ipvsadm")
 		if err != nil {
-			return "", err
-		}
+			// apt update
+			_, err := apt.UpdateInsidePod(
+				c,
+				podname,
+				namespace)
+			if err != nil {
+				return "", err
+			}
 
-		// apt install ipvsadm
-		_, err = apt.InstallPackageInsidePod(
-			c,
-			podname,
-			namespace,
-			"ipvsadm")
-		if err != nil {
-			return "", err
+			// apt install ipvsadm
+			_, err = apt.InstallPackageInsidePod(
+				c,
+				podname,
+				namespace,
+				"ipvsadm")
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 	filesaved, err := firewall.Save(c,
