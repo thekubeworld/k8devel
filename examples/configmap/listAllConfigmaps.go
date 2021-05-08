@@ -17,15 +17,15 @@ limitations under the License.
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"os"
+
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/configmap"
 	"github.com/thekubeworld/k8devel/pkg/emoji"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
 	e := emoji.LoadEmojis()
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
@@ -38,17 +38,18 @@ func main() {
 
 	configMapList, err := configmap.ListAll(&c)
 	if err != nil {
-		logrus.Fatal(err)
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
 	}
 	for _, cm := range configMapList.Items {
-		logrus.Infof("Name %s", cm.ObjectMeta.Name)
-		logrus.Infof("Namespace: %s", cm.ObjectMeta.Namespace)
+		fmt.Printf("Name %s\n", cm.ObjectMeta.Name)
+		fmt.Printf("Namespace: %s\n", cm.ObjectMeta.Namespace)
 		for _, d := range cm.Data {
-			logrus.Infof(d)
+			fmt.Printf("%s", d)
 		}
-		logrus.Infof("\n")
+		fmt.Printf("\n")
 	}
-	logrus.Infof("Number total if configmaps: %v %s %s",
+	fmt.Printf("Number total if configmaps: %v %s %s\n",
 		len(configMapList.Items),
 		emoji.Show(e.Rocket),
 		emoji.Show(e.Collision))
