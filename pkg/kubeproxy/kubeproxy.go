@@ -24,8 +24,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/thekubeworld/k8devel/pkg/apt"
 	"github.com/thekubeworld/k8devel/pkg/client"
+	"github.com/thekubeworld/k8devel/pkg/debian/apt"
 	"github.com/thekubeworld/k8devel/pkg/firewall"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 )
