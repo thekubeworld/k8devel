@@ -44,7 +44,7 @@ type Client struct {
 //
 // Returns:
 //   - Client struct
-func (client *Client) Connect() *Client {
+func (client *Client) Connect() (*Client, error) {
 	// TODO: Users can specify by dynamic the HOME for kubeconfig
 	home, exists := os.LookupEnv("HOME")
 	if !exists {
@@ -54,16 +54,16 @@ func (client *Client) Connect() *Client {
 	configPath := filepath.Join(home, ".kube", "config")
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	client.Clientset, err = kubernetes.NewForConfig(config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	client.KubeClientFromConfig()
-	return client
+	return client, nil
 }
 
 // KubeClientFromConfig will provide the REST interface
