@@ -17,15 +17,14 @@ limitations under the License.
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"os"
+
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/deployment"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
-
 	newDeployment := "newdeployment" // Put here the new deployment name
 	namespace := "default"           // Put here the namespace name
 
@@ -54,8 +53,9 @@ func main() {
 
 	err := deployment.Create(&c, &d)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
 
-	logrus.Infof("Deployment %s namespace %s created!", newDeployment, namespace)
+	fmt.Printf("Deployment %s namespace %s created\n", newDeployment, namespace)
 }
