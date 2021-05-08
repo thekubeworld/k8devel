@@ -17,15 +17,14 @@ limitations under the License.
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"os"
+
 	"github.com/thekubeworld/k8devel/pkg/client"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 	"github.com/thekubeworld/k8devel/pkg/service"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
-
 	newService := "newservice" // Put here the new Service name
 	namespace := "default"     // Put here the namespace name
 
@@ -51,7 +50,8 @@ func main() {
 	}
 	err := service.CreateClusterIP(&c, &s)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
 
 	IPService, err := service.GetIP(
@@ -59,8 +59,9 @@ func main() {
 		newService,
 		namespace)
 	if err != nil {
-		logrus.Fatal("exiting... failed to create: ", err)
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
-	logrus.Infof("Service %s namespace %s created!", newService, namespace)
-	logrus.Infof("ClusterIP Service IP: %s", IPService)
+	fmt.Printf("Service %s namespace %s created\n", newService, namespace)
+	fmt.Printf("ClusterIP Service IP: %s\n", IPService)
 }
