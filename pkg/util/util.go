@@ -121,6 +121,7 @@ func CreateTempFile(dirname string, filename string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+	// DO NOT ADD defer here, it returns the file pointers to the caller
 	return file, nil
 }
 
