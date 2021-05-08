@@ -44,30 +44,30 @@ import (
 //
 func SaveCurrentFirewallState(c *client.Client,
 	configmapname string,
-	podname string,
+	containerName string,
 	namespace string) (string, error) {
 
 	mode, err := DetectKubeProxyMode(c,
 		configmapname,
-		podname,
+		containerName,
 		namespace)
 	if err != nil {
 		return "", err
 	}
 
-	podname, err = FindKubeProxyPod(c, podname, namespace)
+	containerName, err = FindKubeProxyPod(c, containerName, namespace)
 	if err != nil {
 		return "", err
 	}
 
 	if mode == "ipvs" {
 		// check if ipvsadm exists, if not install it
-		_, err := dpkg.CheckPackageInstalled(c, podman, namespace, "ipvsadm")
+		_, err := dpkg.CheckPackageInstalled(c, containerName, namespace, "ipvsadm")
 		if err != nil {
 			// apt update
 			_, err = apt.UpdateInsidePod(
 				c,
-				podname,
+				containerName,
 				namespace)
 			if err != nil {
 				return "", err
@@ -76,7 +76,7 @@ func SaveCurrentFirewallState(c *client.Client,
 			// apt install ipvsadm
 			_, err = apt.InstallPackageInsidePod(
 				c,
-				podname,
+				containerName,
 				namespace,
 				"ipvsadm")
 			if err != nil {
@@ -86,7 +86,7 @@ func SaveCurrentFirewallState(c *client.Client,
 	}
 	filesaved, err := firewall.Save(c,
 		mode,
-		podname,
+		containerName,
 		namespace)
 	if err != nil {
 		return "", err
@@ -101,7 +101,7 @@ func SaveCurrentFirewallState(c *client.Client,
 //
 // Args:
 //	- Pointer to a Client struct
-//	- podname A substring of kube-proxy pod name
+//	- containerName A substring of kube-proxy pod name
 //	- namespace
 //
 // Returns:
@@ -109,11 +109,11 @@ func SaveCurrentFirewallState(c *client.Client,
 //	or error
 //
 func FindKubeProxyPod(c *client.Client,
-	podname string,
+	containerName string,
 	namespace string) (string, error) {
 	// Validation
 	kyPods, kyNumberPods := pod.FindPodsWithNameContains(c,
-		podname, namespace)
+		containerName, namespace)
 	if kyNumberPods < 0 {
 		return "", errors.New(
 			"exiting... unable to find kube-proxy pod")
@@ -126,7 +126,7 @@ func FindKubeProxyPod(c *client.Client,
 // Args:
 //	- Pointer to a Client struct
 //	- configmapname
-//	- podname
+//	- containerName
 //	- namespace
 //
 // Returns:
@@ -134,11 +134,11 @@ func FindKubeProxyPod(c *client.Client,
 //
 func DetectKubeProxyMode(c *client.Client,
 	configmapname string,
-	podname string,
+	containerName string,
 	namespace string) (string, error) {
 
 	// make sure we find at least one kube-proxy pod
-	_, err := FindKubeProxyPod(c, podname, namespace)
+	_, err := FindKubeProxyPod(c, containerName, namespace)
 	if err != nil {
 		return "", err
 	}
