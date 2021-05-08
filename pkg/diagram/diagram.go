@@ -142,3 +142,15 @@ func LoadBalancer() {
 	fmt.Println("  | Kubernetes Cluster                           |  ")
 	fmt.Println("  +----------------------------------------------+  ")
 }
+
+// ExternalName show a diagram about ExternalName Service
+//
+// Args:
+//	None
+//
+// Returns:
+//	None
+//
+//func ExternalName() {
+//
+//}
