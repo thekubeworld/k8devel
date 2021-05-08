@@ -17,15 +17,14 @@ limitations under the License.
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"os"
+
 	"github.com/thekubeworld/k8devel/pkg/client"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
-
 	containerName := "mytesting" // Put here the Pod name
 	namespace := "default"       // Put here the namespace name
 
@@ -48,7 +47,8 @@ func main() {
 
 	err := pod.Create(&c, &p)
 	if err != nil {
-		logrus.Fatal(err)
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
 	}
-	logrus.Infof("Pod %s namespace %s created!", p.Name, p.Namespace)
+	fmt.Printf("Pod %s namespace %s created!\n", p.Name, p.Namespace)
 }
