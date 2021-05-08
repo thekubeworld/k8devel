@@ -17,15 +17,14 @@ limitations under the License.
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"os"
+
 	"github.com/thekubeworld/k8devel/pkg/client"
-	"github.com/thekubeworld/k8devel/pkg/logschema"
 	"github.com/thekubeworld/k8devel/pkg/namespace"
 )
 
 func main() {
-	logschema.SetLogrusLogging()
-
 	newNamespace := "newnamespace" // Put here your new namespace name
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
@@ -39,8 +38,9 @@ func main() {
 	if err != nil {
 		err = namespace.Create(&c, newNamespace)
 		if err != nil {
-			logrus.Fatal("exiting... failed to create: ", err)
+			fmt.Printf("exiting... failed to create: %s\n", err)
+			os.Exit(1)
 		}
 	}
-	logrus.Infof("Namespace %s created!", newNamespace)
+	fmt.Printf("Namespace %s created\n", newNamespace)
 }
