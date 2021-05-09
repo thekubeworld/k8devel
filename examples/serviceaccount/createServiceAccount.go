@@ -47,6 +47,7 @@ func main() {
 		fmt.Printf("%s %s\n", emoji.Show(e.CrossMark), err)
 		os.Exit(1)
 	}
+
 	fmt.Printf("%s create service account: %s\n%s namespace %s\n%s AutomountServiceAccountToken %v\n",
 		emoji.Show(e.Rocket),
 		s.Name,

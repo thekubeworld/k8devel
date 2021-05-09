@@ -62,6 +62,7 @@ func main() {
 		fmt.Printf("exiting... failed to create: %s\n", err)
 		os.Exit(1)
 	}
+
 	fmt.Printf("Service %s namespace %s created\n", newService, namespace)
 	fmt.Printf("ClusterIP Service IP: %s\n", IPService)
 }

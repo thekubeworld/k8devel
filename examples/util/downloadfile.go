@@ -18,17 +18,18 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/thekubeworld/k8devel/pkg/util"
 )
 
 func main() {
 
-	ret, err := util.DownloadFile("https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/metallb.yaml")
+	url := "https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/metallb.yaml"
+	ret, err := util.DownloadFile(url)
 	if err != nil {
 		fmt.Printf("%s\n", err)
+		os.Exit(1)
 	}
-
 	fmt.Printf("File download: %s\n", ret)
-
 }
