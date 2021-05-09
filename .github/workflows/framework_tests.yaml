@@ -33,7 +33,7 @@ jobs:
             mkdir -p downloads
             # download the k8devel lib
             pushd $GOPATH
-              go get github.com/thekubeworld/k8devel/
+              go get -u github.com/thekubeworld/k8devel/
             popd
             # Apply example
             pushd examples/apply/
