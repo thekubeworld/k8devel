@@ -22,7 +22,7 @@ import (
 
 	"github.com/thekubeworld/k8devel/pkg/base64"
 	"github.com/thekubeworld/k8devel/pkg/client"
-	"github.com/thekubeworld/k8devel/pkg/metallb"
+	"github.com/thekubeworld/k8devel/pkg/loadbalancer/metallb"
 	"github.com/thekubeworld/k8devel/pkg/secret"
 )
 
