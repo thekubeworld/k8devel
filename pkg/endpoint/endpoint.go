@@ -241,6 +241,7 @@ func Delete(c *client.Client, endpoint string, namespace string) error {
 		inst.Namespace)
 
 	// Double check endpoint is removed
+	// TODO: We can improve this logic with some pool schema
 	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
 		_, err := Exists(c, &inst)
 		if err != nil {

@@ -35,6 +35,8 @@ type Client struct {
 	Kubeconfig                 clientcmd.ClientConfig
 	TimeoutTaskInSec           int
 	NumberMaxOfAttemptsPerTask int
+	// TODO: remove NumberMaxOfAttemptsPerTask and add some Pool mechanism
+	// for modules that still use it. that
 }
 
 // Connect will connect to specific Cluster

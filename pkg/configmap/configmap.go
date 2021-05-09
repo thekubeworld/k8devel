@@ -92,6 +92,7 @@ func Delete(c *client.Client, configmap string, namespace string) error {
 		namespace)
 
 	// Double check configmap is removed
+	// TODO: We can improve this logic with some pool schema
 	for i := 0; i < c.NumberMaxOfAttemptsPerTask; i++ {
 		_, err := Exists(c, configmap, namespace)
 		if err != nil {
