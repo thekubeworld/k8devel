@@ -40,39 +40,30 @@ func main() {
 	//	- os.Getenv("USERPROFILE") (Windows)
 	c.Connect()
 
-	KPTestNamespaceName := c.Namespace
-
 	randStr, err := util.GenerateRandomString(6, "lower")
 	if err != nil {
 		fmt.Printf("%s\n", err)
 		os.Exit(1)
 	}
-	KPTestServiceName := KPTestNamespaceName +
-		"service" +
-		randStr
 
-	KPTestNginxDeploymentName := KPTestNamespaceName +
-		"nginxdeployment" +
-		randStr
-	// END: kube-proxy variables
+	// kube-proxy variables
+	NamespaceName := c.Namespace + randStr
+	ServiceName := "service" + randStr
+	DeploymentName := "nginxdeployment" + randStr
+	EndpointName := "kproxy-service" + randStr
 
 	// START: Namespace
-	_, err = namespace.Exists(&c,
-		KPTestNamespaceName)
+	err = namespace.Create(&c, NamespaceName)
 	if err != nil {
-		err = namespace.Create(&c,
-			KPTestNamespaceName)
-		if err != nil {
-			fmt.Printf("exiting... failed to create: %s\n", err)
-			os.Exit(1)
-		}
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
 	// END: Namespace
 
 	// START: Deployment
 	d := deployment.Instance{
-		Name:       KPTestNginxDeploymentName,
-		Namespace:  KPTestNamespaceName,
+		Name:       DeploymentName,
+		Namespace:  NamespaceName,
 		Replicas:   1,
 		LabelKey:   "app",
 		LabelValue: "nginx",
@@ -93,8 +84,8 @@ func main() {
 
 	// START: Service
 	s := service.Instance{
-		Name:          KPTestServiceName,
-		Namespace:     KPTestNamespaceName,
+		Name:          ServiceName,
+		Namespace:     NamespaceName,
 		LabelKey:      "k8sapp",
 		LabelValue:    "kproxy-testing",
 		SelectorKey:   "k8sapp",
@@ -107,18 +98,19 @@ func main() {
 		fmt.Printf("exiting... failed to create: %s\n", err)
 		os.Exit(1)
 	}
-	IPService, err := service.GetIP(&c, KPTestServiceName, KPTestNamespaceName)
+
+	IPService, err := service.GetIP(&c, ServiceName, NamespaceName)
 	if err != nil {
 		fmt.Printf("exiting... failed to create: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("%s\n", IPService)
+	fmt.Printf("IP Service %s\n", IPService)
 	// END: Service
 
 	// START: Endpoint
 	e := endpoint.Instance{
-		Name:      "kproxy-service",
-		Namespace: KPTestNamespaceName,
+		Name:      EndpointName,
+		Namespace: NamespaceName,
 		IP:        "172.16.0.80",
 	}
 	e.EndpointPort.Name = "http"
@@ -126,7 +118,7 @@ func main() {
 	e.EndpointPort.Protocol = "TCP"
 
 	epoint, _ := endpoint.Exists(&c, &e)
-	if epoint != "" {
+	if len(epoint) > 0 {
 		err = endpoint.Patch(&c, &e)
 		if err != nil {
 			fmt.Printf("exiting... failed to update: %s\n", err)
@@ -139,7 +131,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	endpoint.Show(&c, "kproxy-service", c.Namespace)
+	endpoint.Show(&c, EndpointName, c.Namespace)
 	endpoint.List(&c, &e)
 	// END: Endpoint
 }
