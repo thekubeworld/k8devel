@@ -107,7 +107,7 @@ func detectSecretType(s string) (v1.SecretType, error) {
 	case "kubernetes.io/dockerconfigjson":
 		return v1.SecretTypeDockerConfigJson, nil
 	}
-	return nil, errors.New("unknown secretType yet")
+	return "", errors.New("unknown secretType yet")
 }
 
 // Exists will check if thsee secret  exists or not
