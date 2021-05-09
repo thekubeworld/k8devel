@@ -22,10 +22,17 @@ import (
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/namespace"
+	"github.com/thekubeworld/k8devel/pkg/util"
 )
 
 func main() {
-	newNamespace := "newnamespace" // Put here your new namespace name
+	randStr, err := util.GenerateRandomString(6, "lower")
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
+	}
+	newNamespace := "newnamespace" + randStr // Put here your new namespace name
+
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
 	c.TimeoutTaksInSec = 2
@@ -34,13 +41,10 @@ func main() {
 	//      - $HOME/kubeconfig (Linux)
 	//      - os.Getenv("USERPROFILE") (Windows)
 	c.Connect()
-	_, err := namespace.Exists(&c, newNamespace)
+	err = namespace.Create(&c, newNamespace)
 	if err != nil {
-		err = namespace.Create(&c, newNamespace)
-		if err != nil {
-			fmt.Printf("exiting... failed to create: %s\n", err)
-			os.Exit(1)
-		}
+		fmt.Printf("exiting... failed to create: %s\n", err)
+		os.Exit(1)
 	}
 	fmt.Printf("Namespace %s created\n", newNamespace)
 }
