@@ -22,7 +22,7 @@ import (
 	"os"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
-	delcmd "github.com/thekubeworld/k8devel/pkg/delete"
+	"github.com/thekubeworld/k8devel/pkg/delete"
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	output := delcmd.YAML(&c, yamlInput)
+	output := delete.YAML(&c, yamlInput)
 	for _, i := range output {
 		fmt.Println(i)
 	}
