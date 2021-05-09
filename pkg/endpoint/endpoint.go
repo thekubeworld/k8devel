@@ -254,7 +254,7 @@ func Delete(c *client.Client, endpoint string, namespace string) error {
 			inst.Name,
 			metav1.DeleteOptions{})
 
-		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
+		time.Sleep(time.Duration(c.TimeoutTaskInSec) * time.Second)
 	}
 
 	return nil

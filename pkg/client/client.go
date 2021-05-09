@@ -33,7 +33,7 @@ type Client struct {
 	Namespace                  string
 	Restconfig                 *rest.Config
 	Kubeconfig                 clientcmd.ClientConfig
-	TimeoutTaksInSec           int
+	TimeoutTaskInSec           int
 	NumberMaxOfAttemptsPerTask int
 }
 

@@ -204,7 +204,7 @@ func WaitForPodInRunningState(c *client.Client, podname string, namespace string
 	if err := waitForPodRunning(c,
 		namespace,
 		podname,
-		time.Duration(c.TimeoutTaksInSec)*time.Second); err != nil {
+		time.Duration(c.TimeoutTaskInSec)*time.Second); err != nil {
 		return err
 	}
 	return nil

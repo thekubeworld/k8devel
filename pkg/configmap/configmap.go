@@ -105,7 +105,7 @@ func Delete(c *client.Client, configmap string, namespace string) error {
 			configmap,
 			metav1.DeleteOptions{})
 
-		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
+		time.Sleep(time.Duration(c.TimeoutTaskInSec) * time.Second)
 	}
 
 	return nil

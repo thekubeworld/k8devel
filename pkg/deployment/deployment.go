@@ -19,10 +19,11 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
+	"time"
+
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"time"
 
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/util"
@@ -140,7 +141,7 @@ func Delete(c *client.Client, deployment string, namespace string) error {
 			deployment,
 			metav1.DeleteOptions{})
 
-		time.Sleep(time.Duration(c.TimeoutTaksInSec) * time.Second)
+		time.Sleep(time.Duration(c.TimeoutTaskInSec) * time.Second)
 	}
 
 	return nil

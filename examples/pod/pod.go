@@ -30,7 +30,7 @@ func main() {
 
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
-	c.TimeoutTaksInSec = 20
+	c.TimeoutTaskInSec = 20
 
 	// Connect to cluster from:
 	//      - $HOME/kubeconfig (Linux)

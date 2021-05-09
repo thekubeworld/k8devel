@@ -33,7 +33,7 @@ func main() {
 	c := client.Client{}
 	c.Namespace = "kptesting"
 	c.NumberMaxOfAttemptsPerTask = 5
-	c.TimeoutTaksInSec = 20
+	c.TimeoutTaskInSec = 20
 
 	// Connect to cluster from:
 	//	- $HOME/kubeconfig (Linux)
