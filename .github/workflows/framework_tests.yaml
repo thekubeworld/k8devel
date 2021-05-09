@@ -36,13 +36,12 @@ jobs:
             pushd $GOPATH/src/github.com/thekubeworld
             git clone http://github.com/thekubeworld/k8devel/
             popd
-            # Apply example
-            pushd examples/apply/
-                go run ./applyyaml.go
-            popd
 
-            # Delete example
-            pushd examples/delete/
-                go run ./deleteyaml.go
-            popd
+            # Execute examples
+            examples=(apply delete base64 pod configmap/listAll configmap/createConfig deployment endpoint execute_command_inside_container metallb namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
+            for name in "${examples[@]}"; do
+                pushd examples/$name/
+                    go run *.go
+                popd
+            done
           popd
