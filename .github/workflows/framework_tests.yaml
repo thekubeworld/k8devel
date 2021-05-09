@@ -32,8 +32,9 @@ jobs:
           pushd ./main
             mkdir -p downloads
             # download the k8devel lib
-            pushd $GOPATH
-              GO111MODULE=off go get -v -d github.com/thekubeworld/k8devel/
+            mkdir -p $GOPATH/src/github.com/thekubeworld
+            pushd $GOPATH/src/github.com/thekubeworld
+              git clone github.com/thekubeworld/k8devel/
             popd
             # Apply example
             pushd examples/apply/
