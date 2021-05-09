@@ -149,11 +149,6 @@ func Create(c *client.Client, cm *Instance) error {
 		},
 	}
 
-	fmt.Printf("\n")
-	fmt.Printf("Creating configmap: %s namespace: %s\n",
-		cm.Name,
-		c.Namespace)
-
 	_, err := c.Clientset.CoreV1().ConfigMaps(cm.Namespace).Create(
 		context.TODO(),
 		configmap,
@@ -161,10 +156,6 @@ func Create(c *client.Client, cm *Instance) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("Created configmap: %s namespace: %s\n",
-		cm.Name,
-		cm.Namespace)
 
 	return nil
 }
