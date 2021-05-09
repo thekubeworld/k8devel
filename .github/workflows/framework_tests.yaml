@@ -38,7 +38,7 @@ jobs:
             popd
 
             # Execute examples
-            examples=(apply delete base64 pod configmap/listAll configmap/createConfig deployment endpoint execute_command_inside_container metallb namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
+            examples=(apply delete base64 pod metallb configmap/listAll configmap/createConfig deployment endpoint execute_command_inside_container namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
             for name in "${examples[@]}"; do
                 pushd examples/$name/
                     go run *.go
