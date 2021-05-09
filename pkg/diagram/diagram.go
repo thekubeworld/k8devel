@@ -151,6 +151,26 @@ func LoadBalancer() {
 // Returns:
 //	None
 //
-//func ExternalName() {
-//
-//}
+func ExternalName() {
+	fmt.Println("+-----+                                ")
+	fmt.Println("| Pod |                                ")
+	fmt.Println("+-----+                                ")
+	fmt.Println("   ^                                   ")
+	fmt.Println("   |                                   ")
+	fmt.Println("   v                                   ")
+	fmt.Println(" myservice                             ")
+	fmt.Println("   +-------+------------------------+  ")
+	fmt.Println("           |    ExternalName        |  ")
+	fmt.Println("           |      Service           |  ")
+	fmt.Println("           |                        |  ")
+	fmt.Println("           | CNAME                  |  ")
+	fmt.Println("           | mydatabase.example.com |  ")
+	fmt.Println("           |                        |  ")
+	fmt.Println("           +------------------------+  ")
+	fmt.Println("                   ^          ^        ")
+	fmt.Println("                   |          |        ")
+	fmt.Println("                   v          v        ")
+	fmt.Println("                 +--------------+      ")
+	fmt.Println("                 |   database   |      ")
+	fmt.Println("                 +--------------+      ")
+}
