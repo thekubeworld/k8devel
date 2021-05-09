@@ -77,6 +77,8 @@ func YAML(c *client.Client, yamlInput []byte) []string {
 			namespace := ""
 			if len(obj.(*v1.ServiceAccount).Namespace) == 0 {
 				namespace = "default"
+			} else {
+				namespace = obj.(*v1.ServiceAccount).Namespace
 			}
 			_, err = c.Clientset.CoreV1().ServiceAccounts(namespace).Create(
 				context.TODO(),
