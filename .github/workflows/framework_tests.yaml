@@ -1,0 +1,44 @@
+name: "framework tests"
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily, 3:00pm
+    - cron: '00 15 * * *'
+
+jobs:
+  framework-tests:
+    runs-on: [ ubuntu-18.04 ]
+    env:
+      GOPATH: /home/runner/work/k8devel/go
+      GO111MODULE: auto
+    steps:
+      - uses: actions/checkout@v2
+        with:
+           path: main
+
+        # Setup Go
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16.x'
+      - uses: actions/checkout@master
+        with:
+          repository: thekubeworld/k8s-local-dev
+          path: k8s-local-dev
+      - run: |
+          pushd ./k8s-local-dev
+            ./k8s-local-dev kindnetd
+          popd
+          pushd ./main
+            mkdir -p downloads
+            go get github.com/thekubeworld/k8devel/
+            # Apply example
+            pushd examples/apply/
+                go run ./applyyaml.go
+            popd
+
+            # Delete example
+            pushd examples/delete/
+                go run ./deleteyaml.go
+            popd
+          popd
