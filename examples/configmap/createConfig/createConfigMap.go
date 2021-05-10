@@ -37,9 +37,9 @@ func main() {
 	c.Connect()
 
 	cfgmap := configmap.Instance{
-		Name:        "config",
+		Name:        "configtest",
 		Namespace:   "metallb-system",
-		ConfigKey:   "config",
+		ConfigKey:   "configtest",
 		ConfigValue: "address-pools:\n- name: default\n  protocol: layer2\n  addresses:\n  - 172.17.255.1-172.17.255.250 \n",
 	}
 
