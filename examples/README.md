@@ -5,6 +5,7 @@ $ export GOPATH=$(go env GOPATH)
 $ cd $GOPATH/src
 $ go get github.com/thekubeworld/k8devel
 
+$ mkdir $HOME/tests && cd $HOME/tests
 $ git clone https://github.com/thekubeworld/k8devel
 $ cd k8devel/examples
 $ go run namespace/create_namespace.go
