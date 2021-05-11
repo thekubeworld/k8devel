@@ -1,7 +1,12 @@
 To run any example, make sure the system has k8devel module for Go and execute `go run myexample.go`
 
 ```
+$ export GOPATH=$(go env GOPATH)
+$ cd $GOPATH/src
 $ go get github.com/thekubeworld/k8devel
+
+$ git clone https://github.com/thekubeworld/k8devel
+$ cd k8devel/examples
 $ go run namespace/create_namespace.go
 ```
 
