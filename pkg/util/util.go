@@ -33,7 +33,7 @@ import (
 )
 
 // DetectContainerPortProtocol is a helper for users
-// use only TCP or UDP string instead of require them
+// to use TCP or UDP words instead of require them
 // to manage k8s.io/api/core/v1. This will convert
 // TCP or UDP to v1.ProtocolTCP or v1.ProtocolUDP
 //
@@ -50,6 +50,29 @@ func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
 		return v1.ProtocolUDP, nil
 	}
 	return "", errors.New("unknown protocol")
+}
+
+// DetectContainerRestartPolicy is a helper for users to more
+// friendly words like: onfailure, never or always instead of
+// require them to manage k8s.io/api/core/v1.
+//
+// Args:
+// 	onfailure, always, never
+//
+// Returns:
+//	v1.RestartPolicyOnFailure
+//	v1.RestartPolicyNever
+//	v1.RestartPolicyAlways or error
+func DetectContainerRestartPolicy(protocol string) (v1.Protocol, error) {
+	switch strings.ToLower(protocol) {
+	case "onfailure":
+		return v1.RestartPolicyOnFailure, nil
+	case "never":
+		return v1.RestartPolicyNever, nil
+	case "always":
+		return v1.RestartPolicyAlways, nil
+	}
+	return "", errors.New("unknown restart policy")
 }
 
 // CompareFiles will compare two files, byte by byte
