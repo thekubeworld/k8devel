@@ -63,7 +63,7 @@ func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
 //	v1.RestartPolicyOnFailure
 //	v1.RestartPolicyNever
 //	v1.RestartPolicyAlways or error
-func DetectContainerRestartPolicy(protocol string) (v1.Protocol, error) {
+func DetectContainerRestartPolicy(protocol string) (v1.RestartPolicy, error) {
 	switch strings.ToLower(protocol) {
 	case "onfailure":
 		return v1.RestartPolicyOnFailure, nil
