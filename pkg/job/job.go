@@ -27,7 +27,7 @@ import (
 	"github.com/thekubeworld/k8devel/pkg/util"
 )
 
-// Instance type refers to the Deployment object
+// Instance type refers to the Job object
 type Instance struct {
 	Name          string
 	Namespace     string
