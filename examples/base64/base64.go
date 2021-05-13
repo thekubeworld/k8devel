@@ -18,7 +18,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/thekubeworld/k8devel/pkg/base64"
+
+	"github.com/thekubeworld/k8devel/pkg/util/base64"
 )
 
 func main() {
@@ -27,6 +28,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
-	fmt.Printf("Generated random base64 string: %s", str)
+	fmt.Printf("Generated random base64 string: %s\n", str)
 
 }
