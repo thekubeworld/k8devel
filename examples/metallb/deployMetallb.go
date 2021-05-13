@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/thekubeworld/k8devel/pkg/base64"
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/loadbalancer/metallb"
 	"github.com/thekubeworld/k8devel/pkg/secret"
+	"github.com/thekubeworld/k8devel/pkg/util/base64"
 )
 
 func main() {
