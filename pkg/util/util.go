@@ -29,8 +29,30 @@ import (
 	"strings"
 	"time"
 
+	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 )
+
+// DetectConcurrencyPolicy is a helper for users
+// use only Allow, Forbid and Replace instead of require
+// them to manage k8s.io/api/batch/v1/types.go
+//
+// Args:
+// 	allow, forbid, replace
+//
+// Returns:
+//	batch.AllowConcurrent, batch.ForbidConcurrent, batch.ReplaceConcurrent
+func DetectConcurrencyPolicy(currencyPolicy string) (batchv1.ConcurrencyPolicy, error) {
+	switch strings.ToLower(currencyPolicy) {
+	case "allow":
+		return batchv1.AllowConcurrent, nil
+	case "forbid":
+		return batchv1.ForbidConcurrent, nil
+	case "replace":
+		return batchv1.ReplaceConcurrent, nil
+	}
+	return "", errors.New("unknown concurrency policy")
+}
 
 // DetectContainerPortProtocol is a helper for users
 // to use TCP or UDP words instead of require them
@@ -38,10 +60,10 @@ import (
 // TCP or UDP to v1.ProtocolTCP or v1.ProtocolUDP
 //
 // Args:
-// 	protocol - TCP or UDP as string
+//     protocol - tcp or udp as string
 //
 // Returns:
-//	v1.ProtocolUDP, v1.ProtocolTCP or error
+//     v1.ProtocolUDP, v1.ProtocolTCP or error
 func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
 	switch strings.ToLower(protocol) {
 	case "tcp":
@@ -63,8 +85,8 @@ func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
 //	v1.RestartPolicyOnFailure
 //	v1.RestartPolicyNever
 //	v1.RestartPolicyAlways or error
-func DetectContainerRestartPolicy(protocol string) (v1.RestartPolicy, error) {
-	switch strings.ToLower(protocol) {
+func DetectContainerRestartPolicy(policy string) (v1.RestartPolicy, error) {
+	switch strings.ToLower(policy) {
 	case "onfailure":
 		return v1.RestartPolicyOnFailure, nil
 	case "never":
