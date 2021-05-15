@@ -7,7 +7,7 @@ on:
 
 jobs:
   framework-tests:
-    runs-on: [ ubuntu-18.04 ]
+    runs-on: self-hosted
     env:
       GOPATH: /home/runner/work/k8devel/go
       GO111MODULE: auto
