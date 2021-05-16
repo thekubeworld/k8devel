@@ -61,12 +61,3 @@ jobs:
                 popd
             done
           popd
-  cleanerpostrun:
-    needs: [framework-tests]
-    runs-on: self-hosted
-    steps:
-      - name: Runner workspace path
-        run: |
-          echo "Cleaning up previous run"
-          rm -rf /home/runner/work/k8devel/
-          rm -rf /home/runner/_work/k8devel/
