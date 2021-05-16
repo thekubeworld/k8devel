@@ -12,6 +12,12 @@ jobs:
       GOPATH: /home/runner/work/k8devel/go
       GO111MODULE: auto
     steps:
+      - name: Runner workspace path
+        run: |
+          echo "Cleaning up previous run"
+          cd ~/_work
+          rm -rf *
+    steps:
       - uses: actions/checkout@v2
         with:
            path: main
