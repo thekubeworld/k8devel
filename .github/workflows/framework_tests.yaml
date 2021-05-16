@@ -35,6 +35,7 @@ jobs:
           repository: thekubeworld/k8s-local-dev
           path: k8s-local-dev
       - run: |
+          sudo dnf install patch -y
           pushd ./k8s-local-dev
             ./k8s-local-dev kindnetd
           popd
@@ -45,8 +46,7 @@ jobs:
             pushd $GOPATH/src/github.com/thekubeworld
               git clone http://github.com/thekubeworld/k8devel/
             popd
-            #examples=(apply delete base64 pod metallb configmap/listAll configmap/createConfig deployment endpoint execute_command_inside_container namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
-          examples=(base64 pod metallb configmap/listAll configmap/createConfig deployment endpoint execute_command_inside_container namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
+            examples=(apply delete base64 pod metallb configmap/listAll configmap/createConfig deployment endpoint execute_command_inside_container namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
             echo $pwd
             echo "dir 0"
             for name in "${examples[@]}"; do
@@ -64,4 +64,5 @@ jobs:
       - name: Runner workspace path
         run: |
           echo "Cleaning up previous run"
-          rm -rf "${{ github.workspace }}"
+          rm -rf /home/runner/work/k8devel/
+          rm -rf /home/runner/_work/k8devel/
