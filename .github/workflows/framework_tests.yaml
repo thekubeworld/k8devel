@@ -14,6 +14,7 @@ jobs:
           echo "Cleaning up previous run"
           rm -rf "${{ github.workspace }}"
   framework-tests:
+    needs: [cleaner]
     runs-on: self-hosted
     env:
       GOPATH: /home/runner/work/k8devel/go
