@@ -6,7 +6,7 @@ on:
     - cron: '00 15 * * *'
 
 jobs:
- cleaner:
+  cleaner:
     runs-on: self-hosted
     steps:
       - name: Runner workspace path
