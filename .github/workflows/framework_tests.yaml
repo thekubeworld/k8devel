@@ -11,7 +11,7 @@ jobs:
     env:
       GOPATH: /home/runner/work/k8devel/go
       GO111MODULE: auto
-   steps:
+    steps:
       - name: Runner workspace path
         run: |
           echo "Cleaning up previous run"
