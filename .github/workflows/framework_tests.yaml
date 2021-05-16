@@ -11,6 +11,11 @@ jobs:
     env:
       GOPATH: /home/runner/work/k8devel/go
       GO111MODULE: auto
+   steps:
+      - name: Runner workspace path
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf "${{ github.workspace }}"
     steps:
       - uses: actions/checkout@v2
         with:
