@@ -35,7 +35,8 @@ jobs:
           repository: thekubeworld/k8s-local-dev
           path: k8s-local-dev
       - run: |
-          sudo dnf install patch -y
+          sudo apt update -y
+          sudo apt install patch -y
           pushd ./k8s-local-dev
             ./k8s-local-dev kindnetd
           popd
