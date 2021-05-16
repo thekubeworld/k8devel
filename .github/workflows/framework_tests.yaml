@@ -35,6 +35,9 @@ jobs:
           repository: thekubeworld/k8s-local-dev
           path: k8s-local-dev
       - run: |
+          echo "==========="
+          echo $GOPATH
+          echo "==========="
           sudo apt update -y
           sudo apt install patch -y
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
