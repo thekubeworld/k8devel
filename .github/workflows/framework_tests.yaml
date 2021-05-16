@@ -6,15 +6,15 @@ on:
     - cron: '00 15 * * *'
 
 jobs:
-  #cleaner:
-  #  runs-on: self-hosted
-  #  steps:
-  #    - name: Runner workspace path
-  #      run: |
-  #        echo "Cleaning up previous run"
-  #        rm -rf "${{ github.workspace }}"
+  cleaner:
+    runs-on: self-hosted
+    steps:
+      - name: Runner workspace path
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf "${{ github.workspace }}"
   framework-tests:
-    #  needs: [cleaner]
+    needs: [cleaner]
     runs-on: self-hosted
     env:
       GOPATH: /home/runner/work/k8devel/go
