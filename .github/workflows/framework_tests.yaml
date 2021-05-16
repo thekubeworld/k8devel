@@ -57,3 +57,10 @@ jobs:
                 popd
             done
           popd
+
+      - uses: actions/cache@v2
+        with:
+          path: $GOPATH/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
