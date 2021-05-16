@@ -6,6 +6,13 @@ on:
     - cron: '00 15 * * *'
 
 jobs:
+ cleaner:
+    runs-on: self-hosted
+    steps:
+      - name: Runner workspace path
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf "${{ github.workspace }}"
   framework-tests:
     runs-on: self-hosted
     env:
