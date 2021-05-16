@@ -16,7 +16,7 @@ jobs:
         run: |
           echo "Cleaning up previous run"
           cd ~/_work
-          rm -rf *
+          rm -rf k8devel
     steps:
       - uses: actions/checkout@v2
         with:
