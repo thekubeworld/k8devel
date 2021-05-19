@@ -32,10 +32,10 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.16.x'
-      - uses: actions/checkout@v2
-        with:
-          repository: thekubeworld/k8s-local-dev
-          path: k8s-local-dev
+        #- uses: actions/checkout@v2
+        #with:
+        #repository: thekubeworld/k8s-local-dev
+        #path: k8s-local-dev
       - run: |
           git clone https://github.com/thekubeworld/k8s-local-dev
           cd k8s-local-dev
