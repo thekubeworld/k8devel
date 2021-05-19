@@ -37,6 +37,7 @@ jobs:
         #repository: thekubeworld/k8s-local-dev
         #path: k8s-local-dev
       - run: |
+          sudo rm -rf k8s-local-dev
           git clone https://github.com/thekubeworld/k8s-local-dev
           cd k8s-local-dev
           sudo apt update -y
