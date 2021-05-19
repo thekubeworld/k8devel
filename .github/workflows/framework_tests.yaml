@@ -54,7 +54,7 @@ jobs:
             pushd $GOPATH/src/github.com/thekubeworld
               git clone http://github.com/thekubeworld/k8devel/
             popd
-            examples=(apply delete base64 metallb configmap/listAll configmap/createConfig deployment endpoint namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
+            examples=(apply delete base64 configmap/listAll configmap/createConfig deployment endpoint namespace podsecuritypolicy service/clusterip/ secret serviceaccount util)
             for name in "${examples[@]}"; do
                 pushd examples/$name/
                     go run *.go
