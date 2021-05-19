@@ -11,14 +11,11 @@ jobs:
     #container:
     #image: ubuntu:latest
     steps:
-      - name: Runner workspace path
-        steps:
-          - name: "Cleaning up the $GITHUB_WORKSPACE as root from a Docker image"
-            # Volume auto mounted by gh actions pointing to the current working-directory
-            run: find /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/. -name . -o -prune -exec rm -rf -- {} + || true
-            #sudo rm -rf /home/runner/work/k8devel/
-            #sudo rm -rf /home/runner/_work/k8devel/
-            #sudo rm -rf /home/runner/_work/k8devel/k8devel/k8s-local-dev
+      # Volume auto mounted by gh actions pointing to the current working-directory
+      run: find /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/. -name . -o -prune -exec rm -rf -- {} + || true
+      #sudo rm -rf /home/runner/work/k8devel/
+      #sudo rm -rf /home/runner/_work/k8devel/
+      #sudo rm -rf /home/runner/_work/k8devel/k8devel/k8s-local-dev
   framework-tests:
     needs: [cleaner]
     runs-on: self-hosted
