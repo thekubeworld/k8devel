@@ -14,6 +14,7 @@ jobs:
           echo "Cleaning up previous run"
           sudo rm -rf /home/runner/work/k8devel/
           sudo rm -rf /home/runner/_work/k8devel/
+          sudo rm -rf /home/runner/_work/k8devel/k8devel/k8s-local-dev
   framework-tests:
     needs: [cleaner]
     runs-on: self-hosted
@@ -32,6 +33,7 @@ jobs:
           go-version: '1.16.x'
       - uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           repository: thekubeworld/k8s-local-dev
           path: k8s-local-dev
       - run: |
