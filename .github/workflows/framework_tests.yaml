@@ -41,7 +41,7 @@ jobs:
           chmod 700 get_helm.sh
           ./get_helm.sh
           pushd ./k8s-local-dev
-            ./k8s-local-dev kindnetd
+            sudo ./k8s-local-dev kindnetd
           popd
           pushd ./main
             mkdir -p downloads
