@@ -35,13 +35,15 @@ jobs:
           repository: thekubeworld/k8s-local-dev
           path: k8s-local-dev
       - run: |
+          kind version
+          kind get clusters
           sudo apt update -y
           sudo apt install patch -y
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
           chmod 700 get_helm.sh
           ./get_helm.sh
           pushd ./k8s-local-dev
-            sudo ./k8s-local-dev kindnetd
+            ./k8s-local-dev kindnetd
           popd
           pushd ./main
             mkdir -p downloads
