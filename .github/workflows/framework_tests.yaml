@@ -36,10 +36,9 @@ jobs:
         with:
           repository: thekubeworld/k8s-local-dev
           path: k8s-local-dev
-          clean: false
       - run: |
-          kind version
-          kind get clusters
+          git clone https://github.com/thekubeworld/k8s-local-dev
+          cd k8s-local-dev
           sudo apt update -y
           sudo apt install patch -y
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
