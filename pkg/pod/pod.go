@@ -93,6 +93,84 @@ func ExecCmd(c *client.Client,
 	return stdout, stderr, nil
 }
 
+// GetLastTimeConditionHappened
+// Get the last time a condition happened in a pod
+//
+// Conditions: 
+//
+//     PodScheduled: the Pod has been scheduled to a node.
+//     ContainersReady: all containers in the Pod are ready.
+//     Initialized: all init containers have started successfully.
+//     Ready: the Pod is able to serve requests and should be added
+//            to the load balancing pools of all matching
+//
+// Args:
+//
+//	- Client struct from client module
+//	- pod name
+//	- namespace
+//
+// Returns:
+//	- the IP as string or error
+func GetLastTimeConditionHappened(c *client.Client,
+	condition string,
+	podName string,
+	nameSpace string) (metav1.Time, error) {
+
+	pod, err := c.Clientset.CoreV1().Pods(nameSpace).Get(
+		context.TODO(),
+		podName,
+		metav1.GetOptions{})
+	if err != nil {
+		return metav1.Time{}, err
+	}
+
+	var requiredCondition v1.PodConditionType
+
+	switch condition {
+	case "ContainersReady":
+		requiredCondition = v1.ContainersReady
+		break
+	case "Initialized":
+		requiredCondition = v1.PodInitialized
+		break
+	case "Ready":
+		requiredCondition = v1.PodReady
+		break
+	case "PodScheduled":
+		requiredCondition = v1.PodScheduled
+		break
+	default:
+		return metav1.Time{}, errors.New("condition not recognized, use: " +
+				"ContainersReady, Initialized, " +
+				"Ready or PodScheduled")
+	}
+
+	for _, cond := range pod.Status.Conditions {
+               if cond.Type == requiredCondition && cond.Status == v1.ConditionTrue {
+		        // Type is the type of the condition.
+			// More info: https://kubernetes.io/docs/
+			//concepts/workloads/pods/pod-lifecycle#pod-conditions
+			//fmt.Println(cond.Type)
+
+			// Status is the status of the condition.
+			// Can be True, False, Unknown.
+			// More info: https://kubernetes.io/docs/concepts/
+			//workloads/pods/pod-lifecycle#pod-conditions
+			//fmt.Println(cond.Status)
+
+			// Last time we probed the condition.
+                        // +optional
+			//fmt.Println(cond.LastProbeTime)
+
+			// Last time the condition transitioned
+			//from one status to another. +optional
+			return cond.LastTransitionTime, nil
+		}
+	}
+	return metav1.Time{}, errors.New("unable to get the last time the " +
+				"condition happened")
+}
 // GetIP will return the pod IP address
 //
 // Args:
