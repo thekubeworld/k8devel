@@ -93,10 +93,10 @@ func ExecCmd(c *client.Client,
 	return stdout, stderr, nil
 }
 
-// GetLastTimeConditionHappened
-// Get the last time a condition happened in a pod
+// GetLastTimeConditionHappened Get the last time a condition
+// happened in a pod
 //
-// Conditions: 
+// Conditions:
 //
 //     PodScheduled: the Pod has been scheduled to a node.
 //     ContainersReady: all containers in the Pod are ready.
@@ -142,13 +142,13 @@ func GetLastTimeConditionHappened(c *client.Client,
 		break
 	default:
 		return metav1.Time{}, errors.New("condition not recognized, use: " +
-				"ContainersReady, Initialized, " +
-				"Ready or PodScheduled")
+			"ContainersReady, Initialized, " +
+			"Ready or PodScheduled")
 	}
 
 	for _, cond := range pod.Status.Conditions {
-               if cond.Type == requiredCondition && cond.Status == v1.ConditionTrue {
-		        // Type is the type of the condition.
+		if cond.Type == requiredCondition && cond.Status == v1.ConditionTrue {
+			// Type is the type of the condition.
 			// More info: https://kubernetes.io/docs/
 			//concepts/workloads/pods/pod-lifecycle#pod-conditions
 			//fmt.Println(cond.Type)
@@ -160,7 +160,7 @@ func GetLastTimeConditionHappened(c *client.Client,
 			//fmt.Println(cond.Status)
 
 			// Last time we probed the condition.
-                        // +optional
+			// +optional
 			//fmt.Println(cond.LastProbeTime)
 
 			// Last time the condition transitioned
@@ -169,8 +169,9 @@ func GetLastTimeConditionHappened(c *client.Client,
 		}
 	}
 	return metav1.Time{}, errors.New("unable to get the last time the " +
-				"condition happened")
+		"condition happened")
 }
+
 // GetIP will return the pod IP address
 //
 // Args:
