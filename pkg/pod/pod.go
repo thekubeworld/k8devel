@@ -35,13 +35,14 @@ import (
 
 // Instance type refers to the Pod object
 type Instance struct {
-	Name        string
-	Namespace   string
-	Image       string
-	Command     []string
-	CommandArgs []string
-	LabelKey    string
-	LabelValue  string
+	Name            string
+	Namespace       string
+	Image           string
+	ImagePullPolicy string
+	Command         []string
+	CommandArgs     []string
+	LabelKey        string
+	LabelValue      string
 }
 
 // ExecCmd executes a command inside a POD
@@ -316,6 +317,18 @@ func Exists(c *client.Client, podName string, namespace string) (string, error) 
 // Return:
 //      - error or nil
 func Create(c *client.Client, p *Instance) error {
+
+	// ImagePullPolicy is optional
+	// By default, the kubelet tries to pull each image from the specified
+	// registry. However, if the imagePullPolicy property of the container
+	// is set to IfNotPresent or Never, then a local image is used
+	// (preferentially or exclusively, respectively).
+	var pullPolicy v1.PullPolicy
+	pullPolicy, err := util.DetectImagePullPolicy(p.ImagePullPolicy)
+	if err != nil {
+		pullPolicy = v1.PullAlways
+	}
+
 	pod := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      p.Name,
@@ -327,10 +340,11 @@ func Create(c *client.Client, p *Instance) error {
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
-					Name:    p.Name,
-					Image:   p.Image,
-					Command: p.Command,
-					Args:    p.CommandArgs,
+					Name:            p.Name,
+					Image:           p.Image,
+					ImagePullPolicy: pullPolicy,
+					Command:         p.Command,
+					Args:            p.CommandArgs,
 				},
 			},
 		},

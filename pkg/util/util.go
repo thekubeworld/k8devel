@@ -74,6 +74,29 @@ func DetectContainerPortProtocol(protocol string) (v1.Protocol, error) {
 	return "", errors.New("unknown protocol")
 }
 
+// DetectImagePullPolicy is a helper for users to use more
+// friendly words like: always, ifnotpresent or never instead
+// to require them to manage k8s.io/api/core/v1.
+//
+// Args:
+// 	ifnotpresent, always or never
+//
+// Returns:
+//	v1.PullAlways
+//	v1.PullNever
+//	v1.PullIfNotPresent or error
+func DetectImagePullPolicy(pullpolicy string) (v1.PullPolicy, error) {
+	switch strings.ToLower(pullpolicy) {
+	case "always":
+		return v1.PullAlways, nil
+	case "never":
+		return v1.PullNever, nil
+	case "ifnotpresent":
+		return v1.PullIfNotPresent, nil
+	}
+	return "", errors.New("unknown image pull policy")
+}
+
 // DetectContainerRestartPolicy is a helper for users to more
 // friendly words like: onfailure, never or always instead of
 // require them to manage k8s.io/api/core/v1.
