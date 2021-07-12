@@ -18,15 +18,15 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"sync"
-	"time"
-	"math"
-	"strconv"
 	"github.com/thekubeworld/k8devel/pkg/client"
 	"github.com/thekubeworld/k8devel/pkg/namespace"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 	"github.com/thekubeworld/k8devel/pkg/util"
+	"math"
+	"os"
+	"strconv"
+	"sync"
+	"time"
 )
 
 var totalSec float64
@@ -36,19 +36,20 @@ var totalHour float64
 func generatePod(c *client.Client, wg *sync.WaitGroup, podName string, nsName string) {
 	defer wg.Done()
 	p := pod.Instance{
-                Name:       podName,
-                Namespace:  nsName,
-                Image:      "nginx",
-                LabelKey:   "app",
-                LabelValue: "podTest",
-        }
+		Name:            podName,
+		Namespace:       nsName,
+		Image:           "nginx",
+		LabelKey:        "app",
+		ImagePullPolicy: "never",
+		LabelValue:      "podTest",
+	}
 
 	timeNow := time.Now()
-        err := pod.Create(c, &p)
-        if err != nil {
-                fmt.Printf("%s\n", err)
-                os.Exit(1)
-        }
+	err := pod.Create(c, &p)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
+	}
 
 	lastTime, err := pod.GetLastTimeConditionHappened(c,
 		"Ready",
@@ -68,24 +69,24 @@ func generatePod(c *client.Client, wg *sync.WaitGroup, podName string, nsName st
 
 	seconds := sf * 60
 	totalSec = totalSec + seconds
-        fmt.Printf("\n- %s is created and responsive in namespace %s\n", p.Name, p.Namespace)
+	fmt.Printf("\n- %s is created and responsive in namespace %s\n", p.Name, p.Namespace)
 
 	fmt.Println("  took:", math.Abs(hour), "hours",
-			math.Abs(minutes), "minutes",
-			math.Abs(seconds), "seconds")
+		math.Abs(minutes), "minutes",
+		math.Abs(seconds), "seconds")
 }
 
 func createNamespace(c *client.Client, nsName string) error {
 	err := namespace.Create(c, nsName)
-        if err != nil {
-                return err
-        }
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func main() {
 
-	fmt.Printf("REPORT GENERATED AT: %v\n\n",  time.Now().Format("2006-01-02 3:4:5 PM"))
+	fmt.Printf("REPORT GENERATED AT: %v\n\n", time.Now().Format("2006-01-02 3:4:5 PM"))
 
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
@@ -96,11 +97,10 @@ func main() {
 	//      - os.Getenv("USERPROFILE") (Windows)
 	c.Connect()
 
-
 	nsName, _ := util.GenerateRandomString(6, "lower")
 
 	err := createNamespace(&c, nsName)
-        if err != nil {
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -113,7 +113,7 @@ func main() {
 		wg.Add(1)
 		generatePod(&c,
 			&wg,
-			"pod" + strconv.Itoa(i),
+			"pod"+strconv.Itoa(i),
 			nsName)
 	}
 
@@ -121,8 +121,8 @@ func main() {
 
 	fmt.Printf("\nTotal time creating pods:\n")
 	fmt.Println("  Hour:", totalHour,
-			"Minutes:", totalHour,
-			"Seconds:", totalSec, "\n")
+		"Minutes:", totalHour,
+		"Seconds:", totalSec, "\n")
 
 	fmt.Printf("Deleting namespace: %s\n", nsName)
 	//namespace.Delete(&c, nsName)
