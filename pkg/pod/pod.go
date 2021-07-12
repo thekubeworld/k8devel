@@ -351,7 +351,7 @@ func Create(c *client.Client, p *Instance) error {
 		},
 	}
 
-	_, err := c.Clientset.CoreV1().Pods(p.Namespace).Create(
+	_, err = c.Clientset.CoreV1().Pods(p.Namespace).Create(
 		context.TODO(),
 		pod,
 		metav1.CreateOptions{})
