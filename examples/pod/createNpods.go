@@ -25,7 +25,6 @@ import (
 	"math"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -33,14 +32,30 @@ var totalSec float64
 var totalMinutes float64
 var totalHour float64
 
-func generatePod(c *client.Client, wg *sync.WaitGroup, podName string, nsName string) {
-	defer wg.Done()
+var sumSec []float64
+var sumMin []float64
+var sumHour []float64
+
+var numberNamespaces = 10
+var numberPods = 100
+
+var imageSource = "docker.io/nginx"
+
+// generatePod create a pod and compare the time spend
+// between the creation and the pod is in running state
+//
+// Args:
+//      Client - struct from client module
+//      podName - pod name
+//      nsName - namespace name
+//
+func generatePod(c *client.Client, podName string, nsName string) {
 	p := pod.Instance{
 		Name:            podName,
 		Namespace:       nsName,
-		Image:           "nginx",
+		Image:           imageSource,
 		LabelKey:        "app",
-		ImagePullPolicy: "never",
+		ImagePullPolicy: "ifnotpresent",
 		LabelValue:      "podTest",
 	}
 
@@ -69,13 +84,24 @@ func generatePod(c *client.Client, wg *sync.WaitGroup, podName string, nsName st
 
 	seconds := sf * 60
 	totalSec = totalSec + seconds
-	fmt.Printf("\n- %s is created and responsive in namespace %s\n", p.Name, p.Namespace)
 
-	fmt.Println("  took:", math.Abs(hour), "hours",
-		math.Abs(minutes), "minutes",
-		math.Abs(seconds), "seconds")
+	fmt.Printf("\n- %s is created and responsive in namespace %s ✅\n", p.Name, p.Namespace)
+	fmt.Printf("- image used: %s\n", imageSource)
+
+	fmt.Println("  took:", hour, "hours",
+		minutes, "minutes",
+		seconds, "seconds")
+
 }
 
+// createNamespace create a namespace
+//
+// Args:
+//      Client - struct from client module
+//      nsName - namespace name
+//
+// Return:
+// 	error or nil
 func createNamespace(c *client.Client, nsName string) error {
 	err := namespace.Create(c, nsName)
 	if err != nil {
@@ -84,9 +110,24 @@ func createNamespace(c *client.Client, nsName string) error {
 	return nil
 }
 
-func main() {
+// sumResults will sum results from exections
+//
+// Args:
+//      []float64 - slice with all results to be sum
+//
+// Return:
+// 	float64
+func sumResults(sumResult []float64) float64 {
+	result := 0.0
+	for _, s := range sumResult {
+		result += s
+	}
+	return result
+}
 
-	fmt.Printf("REPORT GENERATED AT: %v\n\n", time.Now().Format("2006-01-02 3:4:5 PM"))
+// main
+func main() {
+	fmt.Printf("REPORT GENERATED AT: %v\n", time.Now().Format("2006-01-02 3:4:5 PM"))
 
 	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
@@ -97,33 +138,43 @@ func main() {
 	//      - os.Getenv("USERPROFILE") (Windows)
 	c.Connect()
 
-	nsName, _ := util.GenerateRandomString(6, "lower")
+	nsName := ""
+	for i := 0; i < numberNamespaces; i++ {
+		nsName, _ = util.GenerateRandomString(6, "lower")
+		err := createNamespace(&c, nsName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Printf("\nNamespace %s created ✅\n", nsName)
+		fmt.Printf("Creating pods and waiting for running state ⏳")
+		for i := 0; i < numberPods; i++ {
+			generatePod(&c,
+				"pod"+strconv.Itoa(i),
+				nsName)
+		}
 
-	err := createNamespace(&c, nsName)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		sumSec = append(sumSec, totalSec)
+		sumMin = append(sumMin, totalMinutes)
+		sumHour = append(sumHour, totalHour)
+
+		totalHour = 0
+		totalMinutes = 0
+		totalSec = 0
+
+		err = namespace.Delete(&c, nsName)
+		if err != nil {
+			fmt.Println("cannot delete namespace: %s\n", nsName)
+			os.Exit(1)
+		}
 	}
 
-	var wg sync.WaitGroup
-	maxpod := 5
+	fmt.Printf("\n🏁 Summary 🏁\n")
+	fmt.Printf("-----------------------------\n")
+	fmt.Printf("Namespaces created: %v\n", numberNamespaces)
+	fmt.Printf("Pods per Namespaces created: %v\n", numberPods)
+	fmt.Printf("Hours: %v\n", sumResults(sumHour))
+	fmt.Printf("Minutes: %v\n", sumResults(sumMin))
+	fmt.Printf("Seconds: %v\n", sumResults(sumSec))
 
-	fmt.Printf("Generating %d pods in namespace %v...", maxpod, nsName)
-	for i := 0; i <= 100; i++ {
-		wg.Add(1)
-		generatePod(&c,
-			&wg,
-			"pod"+strconv.Itoa(i),
-			nsName)
-	}
-
-	wg.Wait()
-
-	fmt.Printf("\nTotal time creating pods:\n")
-	fmt.Println("  Hour:", totalHour,
-		"Minutes:", totalHour,
-		"Seconds:", totalSec, "\n")
-
-	fmt.Printf("Deleting namespace: %s\n", nsName)
-	//namespace.Delete(&c, nsName)
 }
