@@ -24,4 +24,5 @@ $ cd k8devel/examples/pod
 ```
 $ go build pod.go
 $ ./pod
+Pod mytesting namespace default created!
 ```
