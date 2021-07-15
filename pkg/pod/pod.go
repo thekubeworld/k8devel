@@ -309,6 +309,29 @@ func Exists(c *client.Client, podName string, namespace string) (string, error) 
 	return exists.Name, nil
 }
 
+// CreateWaitRunningState will create a POD and wait
+// the pod be in running state
+//
+// Args:
+//      - Client struct from client module
+//      - Instance struct from pod module
+//
+// Return:
+//      - error or nil
+func CreateWaitRunningState(c *client.Client, p *Instance) error {
+	err := Create(c, p)
+	if err != nil {
+		return err
+	}
+
+	err = WaitForPodInRunningState(c, p.Name, p.Namespace)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 // Create will create a POD
 //
 // Args:
@@ -359,9 +382,5 @@ func Create(c *client.Client, p *Instance) error {
 		return err
 	}
 
-	err = WaitForPodInRunningState(c, p.Name, p.Namespace)
-	if err != nil {
-		return err
-	}
 	return nil
 }
