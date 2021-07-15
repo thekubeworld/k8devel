@@ -6,3 +6,22 @@
 
 
 **A Easy to use** Go **framework** for Kubernetes based on [kubernetes/client-go](https://github.com/kubernetes/client-go), see [examples](https://github.com/thekubeworld/k8devel/tree/main/examples) dir for a quick start.
+
+How to test it?
+
+1. Download the module  
+```
+$ GO111MODULE=on go get github.com/thekubeworld/k8devel
+```
+
+2. Download the source
+```
+$ git clone https://github.com/thekubeworld/k8devel.git
+$ cd k8devel/examples/pod
+```
+
+3. Build and Run
+```
+$ go build createNpods.go
+$ ./createNpods &> output-file.log
+```
