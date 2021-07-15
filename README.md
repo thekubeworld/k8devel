@@ -22,6 +22,6 @@ $ cd k8devel/examples/pod
 
 3. Build and Run
 ```
-$ go build createNpods.go
-$ ./createNpods &> output-file.log
+$ go build pod.go
+$ ./pod
 ```
