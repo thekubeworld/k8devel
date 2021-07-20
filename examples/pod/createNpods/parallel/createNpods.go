@@ -64,6 +64,7 @@ func generatePod(c *client.Client, podName string, nsName string, wg *sync.WaitG
 	}
 
 	//timeNow := time.Now()
+	//fmt.Printf("creating pod %s in namespace %s\n", podName, nsName)
 	err := pod.Create(c, &p)
 	if err != nil {
 		fmt.Printf("%s\n", err)
@@ -107,12 +108,13 @@ func generatePod(c *client.Client, podName string, nsName string, wg *sync.WaitG
 //
 // Return:
 // 	error or nil
-func createNamespace(c *client.Client, nsName string) error {
+func createNamespace(c *client.Client, nsName string, wgNs *sync.WaitGroup) {
+	defer wgNs.Done()
 	err := namespace.Create(c, nsName)
 	if err != nil {
-		return err
+		fmt.Println("Failed to create namespace...")
+		os.Exit(1)
 	}
-	return nil
 }
 
 // sumResults will sum results from exections
@@ -144,22 +146,20 @@ func main() {
 	c.Connect()
 
 	nsName := ""
-	var wg sync.WaitGroup
+	var wgPods sync.WaitGroup
+	var wgNamespaces sync.WaitGroup
 	for i := 0; i < numberNamespaces; i++ {
 		nsName, _ = util.GenerateRandomString(6, "lower")
-		err := createNamespace(&c, nsName)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		wgNamespaces.Add(i)
+		go createNamespace(&c, nsName, &wgNamespaces)
 		fmt.Printf("\nNamespace %s created ✅\n", nsName)
 		fmt.Printf("Creating pods...")
-		for i := 0; i < numberPods; i++ {
-			wg.Add(i)
+		for j := 0; j < numberPods; j++ {
+			wgPods.Add(j)
 			go generatePod(&c,
-				"pod"+strconv.Itoa(i),
+				"pod"+strconv.Itoa(j),
 				nsName,
-				&wg)
+				&wgPods)
 		}
 
 		sumSec = append(sumSec, totalSec)
@@ -173,18 +173,18 @@ func main() {
 		nsSlice = append(nsSlice, nsName)
 
 	}
+	wgNamespaces.Wait()
+	wgPods.Wait()
 
-	fmt.Printf("Waiting the pods be in running state...")
-	wg.Wait()
-
-	for _, n := range nsSlice {
-		err := namespace.Delete(&c, n)
-		if err != nil {
-			fmt.Printf("cannot delete namespace %s\n", n)
-			os.Exit(1)
+	/*
+		for _, n := range nsSlice {
+			err := namespace.Delete(&c, n)
+			if err != nil {
+				fmt.Printf("cannot delete namespace %s\n", n)
+				os.Exit(1)
+			}
 		}
-	}
-
+	*/
 	fmt.Printf("\n🏁 Summary 🏁\n")
 	fmt.Printf("-----------------------------\n")
 	fmt.Printf("Namespaces created: %v\n", numberNamespaces)
