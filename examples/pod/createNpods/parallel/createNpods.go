@@ -24,8 +24,10 @@ import (
 	"github.com/thekubeworld/k8devel/pkg/util"
 	//"math"
 	"os"
+	"os/signal"
 	"strconv"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -42,6 +44,7 @@ var numberNamespaces = 10
 var numberPods = 100
 
 var imageSource = "docker.io/nginx"
+var c = client.Client{}
 
 // generatePod create a pod and compare the time spend
 // between the creation and the pod is in running state
@@ -136,7 +139,6 @@ func sumResults(sumResult []float64) float64 {
 func main() {
 	fmt.Printf("REPORT GENERATED AT: %v\n", time.Now().Format("2006-01-02 3:4:5 PM"))
 
-	c := client.Client{}
 	c.NumberMaxOfAttemptsPerTask = 10
 	c.TimeoutTaskInSec = 1200 // 20 min
 
@@ -148,13 +150,19 @@ func main() {
 	nsName := ""
 	var wgPods sync.WaitGroup
 	var wgNamespaces sync.WaitGroup
-	for i := 0; i < numberNamespaces; i++ {
+	for i := 1; i <= numberNamespaces; i++ {
 		nsName, _ = util.GenerateRandomString(6, "lower")
 		wgNamespaces.Add(i)
 		go createNamespace(&c, nsName, &wgNamespaces)
 		fmt.Printf("\nNamespace %s created ✅\n", nsName)
-		fmt.Printf("Creating pods...")
-		for j := 0; j < numberPods; j++ {
+		fmt.Printf("Creating pods...\n")
+
+		_, err := namespace.Exists(&c, nsName)
+		if err != nil {
+			wgPods.Wait()
+		}
+
+		for j := 1; j <= numberPods; j++ {
 			wgPods.Add(j)
 			go generatePod(&c,
 				"pod"+strconv.Itoa(j),
@@ -174,17 +182,7 @@ func main() {
 
 	}
 	wgNamespaces.Wait()
-	wgPods.Wait()
 
-	/*
-		for _, n := range nsSlice {
-			err := namespace.Delete(&c, n)
-			if err != nil {
-				fmt.Printf("cannot delete namespace %s\n", n)
-				os.Exit(1)
-			}
-		}
-	*/
 	fmt.Printf("\n🏁 Summary 🏁\n")
 	fmt.Printf("-----------------------------\n")
 	fmt.Printf("Namespaces created: %v\n", numberNamespaces)
@@ -192,5 +190,27 @@ func main() {
 	fmt.Printf("Hours: %v\n", sumResults(sumHour))
 	fmt.Printf("Minutes: %v\n", sumResults(sumMin))
 	fmt.Printf("Seconds: %v\n", sumResults(sumSec))
+	cleanup()
 
+}
+
+func cleanup() {
+	for _, n := range nsSlice {
+		fmt.Printf("Deleting %s\n", n)
+		err := namespace.Delete(&c, n)
+		if err != nil {
+			fmt.Printf("cannot delete namespace %s\n", n)
+			os.Exit(1)
+		}
+	}
+}
+
+func init() {
+	ch := make(chan os.Signal)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-ch
+		cleanup()
+		os.Exit(1)
+	}()
 }
