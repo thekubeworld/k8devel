@@ -22,12 +22,12 @@ import (
 	"github.com/thekubeworld/k8devel/pkg/namespace"
 	"github.com/thekubeworld/k8devel/pkg/pod"
 	"github.com/thekubeworld/k8devel/pkg/util"
-	//"math"
+	"math"
 	"os"
-	"os/signal"
+	//"os/signal"
 	"strconv"
 	"sync"
-	"syscall"
+	//"syscall"
 	"time"
 )
 
@@ -42,6 +42,7 @@ var nsSlice []string
 
 var numberNamespaces = 10
 var numberPods = 100
+var totalPodsRunning = 0
 
 var imageSource = "docker.io/nginx"
 var c = client.Client{}
@@ -66,41 +67,49 @@ func generatePod(c *client.Client, podName string, nsName string, wg *sync.WaitG
 		LabelValue:      "podTest",
 	}
 
-	//timeNow := time.Now()
-	//fmt.Printf("creating pod %s in namespace %s\n", podName, nsName)
-	err := pod.Create(c, &p)
+	timeNow := time.Now()
+	fmt.Printf("creating pod %s in namespace %s\n", podName, nsName)
+	err := pod.CreateWaitRunningState(c, &p)
+	//if err != nil {
+	//	fmt.Printf("%s\n", err)
+	//	os.Exit(1)
+	//}
+
+	lastTime, err := pod.GetLastTimeConditionHappened(c,
+		"Ready",
+		podName,
+		nsName)
 	if err != nil {
-		fmt.Printf("%s\n", err)
-		os.Exit(1)
+		fmt.Println(err)
 	}
 
-	/*
-		lastTime, err := pod.GetLastTimeConditionHappened(c,
-			"Ready",
-			podName,
-			nsName)
-		if err != nil {
-			fmt.Println(err)
-		}
+	hour := lastTime.Sub(timeNow).Hours()
+	hour, mf := math.Modf(hour)
+	totalHour = totalHour + hour
 
-			hour := lastTime.Sub(timeNow).Hours()
-			hour, mf := math.Modf(hour)
-			totalHour = totalHour + hour
+	minutes := mf * 60
+	minutes, sf := math.Modf(minutes)
+	totalMinutes = totalMinutes + minutes
 
-			minutes := mf * 60
-			minutes, sf := math.Modf(minutes)
-			totalMinutes = totalMinutes + minutes
+	seconds := sf * 60
+	totalSec = totalSec + seconds
 
-			seconds := sf * 60
-			totalSec = totalSec + seconds
+	fmt.Printf("\n- %s is created and responsive in namespace %s ✅\n", p.Name, p.Namespace)
+	fmt.Printf("- image used: %s\n", imageSource)
 
-			fmt.Printf("\n- %s is created and responsive in namespace %s ✅\n", p.Name, p.Namespace)
-			fmt.Printf("- image used: %s\n", imageSource)
+	fmt.Println("  took:", hour, "hours",
+		minutes, "minutes",
+		seconds, "seconds")
+	sumSec = append(sumSec, totalSec)
+	sumMin = append(sumMin, totalMinutes)
+	sumHour = append(sumHour, totalHour)
+	totalPodsRunning = totalPodsRunning + 1
+	fmt.Printf("TOTAL NUMBER OF PODS RUNNING: %v\n", totalPodsRunning)
+	fmt.Printf("TIME NOW: %v\n", time.Now().Format("2006-01-02 3:4:5 PM"))
 
-			fmt.Println("  took:", hour, "hours",
-				minutes, "minutes",
-				seconds, "seconds")
-	*/
+	totalHour = 0
+	totalMinutes = 0
+	totalSec = 0
 }
 
 // createNamespace create a namespace
@@ -111,7 +120,7 @@ func generatePod(c *client.Client, podName string, nsName string, wg *sync.WaitG
 //
 // Return:
 // 	error or nil
-func createNamespace(c *client.Client, nsName string, wgNs *sync.WaitGroup) {
+func createNamespaces(c *client.Client, nsName string, wgNs *sync.WaitGroup) {
 	defer wgNs.Done()
 	err := namespace.Create(c, nsName)
 	if err != nil {
@@ -135,53 +144,49 @@ func sumResults(sumResult []float64) float64 {
 	return result
 }
 
+func generateNamespaces(wgNs *sync.WaitGroup) {
+	nsName := ""
+	for i := 1; i <= numberNamespaces; i++ {
+		nsName, _ = util.GenerateRandomString(6, "lower")
+		wgNs.Add(1)
+		go createNamespaces(&c, nsName, wgNs)
+		nsSlice = append(nsSlice, nsName)
+	}
+}
+
 // main
 func main() {
 	fmt.Printf("REPORT GENERATED AT: %v\n", time.Now().Format("2006-01-02 3:4:5 PM"))
 
 	c.NumberMaxOfAttemptsPerTask = 10
-	c.TimeoutTaskInSec = 1200 // 20 min
+	//c.TimeoutTaskInSec = 1200  // 20 min
+	//c.TimeoutTaskInSec = 10800 // 3 hours
+	c.TimeoutTaskInSec = 3600 // 1 hours
 
 	// Connect to cluster from:
 	//      - $HOME/kubeconfig (Linux)
 	//      - os.Getenv("USERPROFILE") (Windows)
 	c.Connect()
 
-	nsName := ""
 	var wgPods sync.WaitGroup
 	var wgNamespaces sync.WaitGroup
-	for i := 1; i <= numberNamespaces; i++ {
-		nsName, _ = util.GenerateRandomString(6, "lower")
-		wgNamespaces.Add(i)
-		go createNamespace(&c, nsName, &wgNamespaces)
-		fmt.Printf("\nNamespace %s created ✅\n", nsName)
-		fmt.Printf("Creating pods...\n")
 
-		_, err := namespace.Exists(&c, nsName)
-		if err != nil {
-			wgPods.Wait()
-		}
+	generateNamespaces(&wgNamespaces)
+	wgNamespaces.Wait()
+	fmt.Printf("created %s namespaces\n", nsSlice)
 
+	fmt.Printf("Creating pods...\n")
+	for _, nsName := range nsSlice {
 		for j := 1; j <= numberPods; j++ {
-			wgPods.Add(j)
+			wgPods.Add(1)
 			go generatePod(&c,
 				"pod"+strconv.Itoa(j),
 				nsName,
 				&wgPods)
+
 		}
-
-		sumSec = append(sumSec, totalSec)
-		sumMin = append(sumMin, totalMinutes)
-		sumHour = append(sumHour, totalHour)
-
-		totalHour = 0
-		totalMinutes = 0
-		totalSec = 0
-
-		nsSlice = append(nsSlice, nsName)
-
 	}
-	wgNamespaces.Wait()
+	wgPods.Wait()
 
 	fmt.Printf("\n🏁 Summary 🏁\n")
 	fmt.Printf("-----------------------------\n")
@@ -190,7 +195,27 @@ func main() {
 	fmt.Printf("Hours: %v\n", sumResults(sumHour))
 	fmt.Printf("Minutes: %v\n", sumResults(sumMin))
 	fmt.Printf("Seconds: %v\n", sumResults(sumSec))
+	fmt.Println("=========================")
+
+	fmt.Println("Absolute time:")
+	sec := int(sumResults(sumSec))
+	min := 0
+	if sec > 60 {
+		min := sec / 60
+		fmt.Printf("Minutes: %v\n", min)
+	} else {
+		fmt.Printf("Seconds: %v\n", sec)
+	}
+
+	if min > 60 {
+		hour := min / 60
+		fmt.Printf("Hour: %v\n", hour)
+	}
+
+	fmt.Printf("\nCleaning created objects during the tests...\n")
 	cleanup()
+
+	fmt.Println("done!")
 
 }
 
@@ -205,6 +230,7 @@ func cleanup() {
 	}
 }
 
+/*
 func init() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
@@ -213,4 +239,4 @@ func init() {
 		cleanup()
 		os.Exit(1)
 	}()
-}
+}*/
