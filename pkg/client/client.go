@@ -35,6 +35,9 @@ type Client struct {
 	Kubeconfig                 clientcmd.ClientConfig
 	TimeoutTaskInSec           int
 	NumberMaxOfAttemptsPerTask int
+	QPS                        float32 // Queries per second
+	Burst                      int     // Suddently increase of call to API
+
 	// TODO: remove NumberMaxOfAttemptsPerTask and add some Pool mechanism
 	// for modules that still use it. that
 }
@@ -55,6 +58,26 @@ func (client *Client) Connect() (*Client, error) {
 
 	configPath := filepath.Join(home, ".kube", "config")
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+
+	// QPS and Burst settings helps users that want to increase
+	// the number of call per second against API Server, common
+	// warning message:
+	//
+	// ... request.go:XX Waited for 1.19126963s
+	// due to client-side throttling, not priority and fairness,
+	// request: POST:https://foobar:6443/api/v1...
+	//
+	// Examples of increase:
+	// QPS: 6000 Bust: 30000
+	// QPS: 1000 Bust: 1000 etc
+	if client.QPS > 0 {
+		config.QPS = client.QPS
+	}
+
+	if client.Burst > 0 {
+		config.Burst = client.Burst
+	}
+
 	if err != nil {
 		return nil, err
 	}
