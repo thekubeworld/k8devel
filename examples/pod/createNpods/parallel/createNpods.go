@@ -162,6 +162,8 @@ func main() {
 	//c.TimeoutTaskInSec = 1200  // 20 min
 	//c.TimeoutTaskInSec = 10800 // 3 hours
 	c.TimeoutTaskInSec = 3600 // 1 hours
+	c.QPS = 1000
+	c.Burst = 1000
 
 	// Connect to cluster from:
 	//      - $HOME/kubeconfig (Linux)
