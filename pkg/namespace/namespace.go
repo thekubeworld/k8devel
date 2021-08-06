@@ -45,14 +45,14 @@ func Delete(c *client.Client, namespace string) error {
 	return nil
 }
 
-// ListAll will list all ConfigMaps
+// List will list all Namespaces
 //
 // Args:
 //
 //      - Client struct from client module
 //
 // Returns:
-//      - pointer v1.ConfigMapList or error
+//      - pointer v1.NamespaceList or error
 func List(c *client.Client) (*v1.NamespaceList, error) {
 	namespaces, err := c.Clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
