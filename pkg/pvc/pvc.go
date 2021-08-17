@@ -25,6 +25,24 @@ import (
 	"github.com/thekubeworld/k8devel/pkg/client"
 )
 
+// Delete will delete a pvc
+//
+// Args:
+//      - Pointer to a Client struct
+//      - namespace name
+//	- pvc name
+//
+// Returns:
+//     error or nil
+//
+func Delete(c *client.Client, namespace string, pvcname string) error {
+	err := c.Clientset.CoreV1().PersistentVolumeClaims(namespace).Delete(context.TODO(), pvcname, metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // List will list all Namespaces
 //
 // Args:
