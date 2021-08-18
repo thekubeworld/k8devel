@@ -70,17 +70,17 @@ func DetectConcurrencyPolicy(currencyPolicy string) (batchv1.ConcurrencyPolicy, 
 //
 // Returns:
 //	v1.PersistentVolumeAccessMode (v1.ReadOnlyMany, v1.ReadWriteMany, v1.ReadWriteOnce) or error
-func DetectVolumeAccessModes(access string) (v1.PersistentVolumeAccessMode, error) {
+func DetectVolumeAccessModes(access string) ([]v1.PersistentVolumeAccessMode, error) {
 
 	switch strings.ToLower(access) {
 	case "readonlymany", "rox":
-		return v1.ReadOnlyMany, nil
+		return []v1.PersistentVolumeAccessMode{v1.ReadOnlyMany}, nil
 	case "readwritemany", "rwx":
-		return v1.ReadWriteMany, nil
+		return []v1.PersistentVolumeAccessMode{v1.ReadWriteMany}, nil
 	case "readwriteonce", "rwo":
-		return v1.ReadWriteOnce, nil
+		return []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce}, nil
 	}
-	return "", errors.New("unknown access mode")
+	return nil, errors.New("unknown access mode")
 }
 
 // DetectContainerPortProtocol is a helper for users
