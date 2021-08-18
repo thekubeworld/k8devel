@@ -54,7 +54,7 @@ func DetectConcurrencyPolicy(currencyPolicy string) (batchv1.ConcurrencyPolicy, 
 	return "", errors.New("unknown concurrency policy")
 }
 
-// DetectVolumeAccessMode is a helper for users
+// DetectVolumeAccessModes is a helper for users
 // use access mode as: rox, rwo, rwx, readonlymany,
 // readwritemany, readwriteonce
 //
@@ -70,7 +70,7 @@ func DetectConcurrencyPolicy(currencyPolicy string) (batchv1.ConcurrencyPolicy, 
 //
 // Returns:
 //	v1.PersistentVolumeAccessMode (v1.ReadOnlyMany, v1.ReadWriteMany, v1.ReadWriteOnce) or error
-func DetectVolumeAccessMode(access string) (v1.PersistentVolumeAccessMode, error) {
+func DetectVolumeAccessModes(access string) (v1.PersistentVolumeAccessMode, error) {
 
 	switch strings.ToLower(access) {
 	case "readonlymany", "rox":
