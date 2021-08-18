@@ -54,6 +54,35 @@ func DetectConcurrencyPolicy(currencyPolicy string) (batchv1.ConcurrencyPolicy, 
 	return "", errors.New("unknown concurrency policy")
 }
 
+// DetectVolumeAccessMode is a helper for users
+// use access mode as: rox, rwo, rwx, readonlymany,
+// readwritemany, readwriteonce
+//
+// Remember:
+//
+// ROX - ReadOnlyMany - can be mounted in read-only mode to many hosts
+// RWO - ReadWriteOnce - can be mounted in read/write mode to exactly 1 host
+// RWX - ReadWriteMany - can be mounted in read/write mode to many hosts
+//
+// Args:
+//	string - rox, rwo, rwx, readonlymany,
+//		 readwritemany, readwriteonce
+//
+// Returns:
+//	v1.PersistentVolumeAccessMode (v1.ReadOnlyMany, v1.ReadWriteMany, v1.ReadWriteOnce) or error
+func DetectVolumeAccessMode(access string) (v1.PersistentVolumeAccessMode, error) {
+
+	switch strings.ToLower(access) {
+	case "readonlymany", "rox":
+		return v1.ReadOnlyMany, nil
+	case "readwritemany", "rwx":
+		return v1.ReadWriteMany, nil
+	case "readwriteonce", "rwo":
+		return v1.ReadWriteOnce, nil
+	}
+	return "", errors.New("unknown access mode")
+}
+
 // DetectContainerPortProtocol is a helper for users
 // to use TCP or UDP words instead of require them
 // to manage k8s.io/api/core/v1. This will convert
