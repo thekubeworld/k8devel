@@ -83,6 +83,29 @@ func DetectVolumeAccessModes(access string) ([]v1.PersistentVolumeAccessMode, er
 	return nil, errors.New("unknown access mode")
 }
 
+// DetectVolumeMode is a helper for users
+// use mode as:
+//
+// persistentvolumeblock or block
+// persistentvolumefilesystem or filesystem
+//
+// Args:
+//	string - persistentvolumeblock or block
+//               persistentvolumefilesystem or filesystem
+//
+// Returns:
+//	v1.PersistentVolumeMode or error
+func DetectVolumeMode(mode string) (v1.PersistentVolumeMode, error) {
+
+	switch strings.ToLower(mode) {
+	case "persistentvolumeblock", "block":
+		return v1.PersistentVolumeBlock, nil
+	case "persistentvolumefilesystem", "filesystem":
+		return v1.PersistentVolumeFilesystem, nil
+	}
+	return "", errors.New("unknown volume mode")
+}
+
 // DetectContainerPortProtocol is a helper for users
 // to use TCP or UDP words instead of require them
 // to manage k8s.io/api/core/v1. This will convert
