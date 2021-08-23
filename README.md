@@ -7,7 +7,7 @@
 
 **An Easy to use** Go **framework** for Kubernetes based on [kubernetes/client-go](https://github.com/kubernetes/client-go), see [examples](https://github.com/thekubeworld/k8devel/tree/main/examples) dir for a quick start.
 
-How to test it ?
+How to test it?
 
 1. Download the module  
 ```
