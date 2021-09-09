@@ -31,6 +31,7 @@ import (
 
 	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 // DetectConcurrencyPolicy is a helper for users
@@ -300,4 +301,20 @@ func GenerateRandomString(numberOfChars int, modeString string) (string, error) 
 		result[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(result), nil
+}
+
+// GetResourceList returns a ResourceList with the
+// specified cpu and memory or disk resource values
+func GetResourceList(cpu string, memory string, ephemeralStorage string) v1.ResourceList {
+	res := v1.ResourceList{}
+	if cpu != "" {
+		res[v1.ResourceCPU] = resource.MustParse(cpu)
+	}
+	if memory != "" {
+		res[v1.ResourceMemory] = resource.MustParse(memory)
+	}
+	if ephemeralStorage != "" {
+		res[v1.ResourceEphemeralStorage] = resource.MustParse(ephemeralStorage)
+	}
+	return res
 }
