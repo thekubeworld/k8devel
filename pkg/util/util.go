@@ -55,6 +55,28 @@ func DetectConcurrencyPolicy(currencyPolicy string) (batchv1.ConcurrencyPolicy, 
 	return "", errors.New("unknown concurrency policy")
 }
 
+// LimitType is a helper for users to specify the limit type
+// as string: "Pod", "Container" or "PersistentVolumeClaim" in a namespace
+//
+// Args:
+//	string - pod, container or persistentvolumeclaim
+//
+// Returns:
+//	v1.LimitType (v1.LimitTypePod, v1.LimitTypeContainer, v1.LimitTypePersistentVolumeClaim,  or error)
+//
+func DetectLimitType(limitType string) (v1.LimitType, error) {
+
+	switch strings.ToLower(limitType) {
+	case "pod":
+		return v1.LimitTypePod, nil
+	case "container":
+		return v1.LimitTypeContainer, nil
+	case "persistentvolumeclaim":
+		return v1.LimitTypePersistentVolumeClaim, nil
+	}
+	return "", errors.New("unknown limit type")
+}
+
 // DetectVolumeAccessModes is a helper for users
 // use access mode as: rox, rwo, rwx, readonlymany,
 // readwritemany, readwriteonce
