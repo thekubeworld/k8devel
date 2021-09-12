@@ -1,0 +1,3 @@
+create_clusterrole
+delete_clusterrole
+list_clusterrole
