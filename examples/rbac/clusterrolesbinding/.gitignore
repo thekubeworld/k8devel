@@ -1,0 +1,3 @@
+create_clusterrolebinding
+delete_clusterrolebinding
+list_clusterrolebinding
