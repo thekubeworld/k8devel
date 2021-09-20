@@ -34,6 +34,27 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
+// DetectReclaimPolicy is a helper for users to specify the reclaim policy
+// as string: "retain", "delete", "recycle"
+//
+// Args:
+//	string - retain, delete and recycle
+//
+// Returns:
+//	v1.LimitType (v1.LimitTypePod, v1.LimitTypeContainer, v1.LimitTypePersistentVolumeClaim,  or error)
+//
+func DetectReclaimPolicy(reclaimPolicy string) (v1.PersistentVolumeReclaimPolicy, error) {
+	switch strings.ToLower(reclaimPolicy) {
+	case "retain":
+		return v1.PersistentVolumeReclaimRetain, nil
+	case "delete":
+		return v1.PersistentVolumeReclaimDelete, nil
+	case "recycle":
+		return v1.PersistentVolumeReclaimRecycle, nil
+	}
+	return "", errors.New("unknown reclaim policy type")
+}
+
 // DetectConcurrencyPolicy is a helper for users
 // use only Allow, Forbid and Replace instead of require
 // them to manage k8s.io/api/batch/v1/types.go
